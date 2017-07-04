@@ -20,6 +20,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -30,6 +31,8 @@ import org.junit.Test;
  */
 public class AccessSDKTest {
 
+	private static final Logger logger = Logger.getLogger(AccessSDKTest.class);
+	
 	// Setup data for comparisons.
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";
@@ -344,7 +347,7 @@ public class AccessSDKTest {
 			doReturn(200).when(mockStatus).getStatusCode();
 			// test method
 			JSONObject deviceInfo = sdk.getDevice(session);
-			System.out.println(deviceInfo);
+			logger.debug(deviceInfo);
 			JSONObject device = deviceInfo.getJSONObject("device");
 			assertTrue(device != null);
 			assertEquals(fingerprint, device.get("id"));
@@ -380,7 +383,7 @@ public class AccessSDKTest {
 			doReturn(mockStatus).when(mockResponse).getStatusLine();
 			doReturn(200).when(mockStatus).getStatusCode();
 			JSONObject decisionInfo = sdk.getDecision(session, user, password);
-			System.out.println(decisionInfo);
+			logger.debug(decisionInfo);
 			assertTrue(decisionInfo != null);
 			// validate device
 			JSONObject decisionn = decisionInfo.getJSONObject("decision");

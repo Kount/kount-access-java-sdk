@@ -12,8 +12,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -26,6 +24,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
@@ -50,7 +49,7 @@ import net.sf.json.JSONObject;
  */
 public class AccessSdk {
 
-	private static final Log logger = LogFactory.getLog(AccessSdk.class);
+	private static final Logger logger = Logger.getLogger(AccessSdk.class);
 
 	/**
 	 * This is the default version of the API Responses that this SDK will request. Future versions are intended to be
@@ -71,7 +70,7 @@ public class AccessSdk {
 	/**
 	 * Array of alphanum characters
 	 */
-	final protected static char[] hexArray = "0123456789abcdef".toCharArray();
+	protected final static char[] hexArray = "0123456789abcdef".toCharArray();
 
 	/**
 	 * Version of the API response to use.
@@ -132,6 +131,9 @@ public class AccessSdk {
 		this.version = DEFAULT_API_VERSION;
 
 		logger.info("Access SDK using merchantId = " + this.merchantId + ", host = " + host);
+		logger.debug("velocity endpoint: " + velocityEndpoint);
+		logger.debug("decisionendpoint: " + decisionEndpoint);
+		logger.debug("device endpoint: " + deviceEndpoint);
 	}
 
 	/**
@@ -189,10 +191,7 @@ public class AccessSdk {
 	public JSONObject getVelocity(String session, String username, String password,
 			Map<String, String> additionalParameters) throws AccessException {
 
-		if (null == session || session.length() != 32) {
-			throw new AccessException(AccessErrorType.INVALID_DATA,
-					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
-		}
+		verifySessionId(session);
 
 		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
 
@@ -228,10 +227,8 @@ public class AccessSdk {
 	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getDevice(String session, HashMap<String, String> additionalParameters) throws AccessException {
-		if (null == session || session.length() != 32) {
-			throw new AccessException(AccessErrorType.INVALID_DATA,
-					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
-		}
+
+		verifySessionId(session);
 
 		StringBuilder parameters = new StringBuilder("?");
 		// version and session
@@ -290,12 +287,9 @@ public class AccessSdk {
 	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getDecision(String session, String username, String password,
-			HashMap<String, String> additionalParameters) throws AccessException {
+			Map<String, String> additionalParameters) throws AccessException {
 
-		if (null == session || session.length() != 32) {
-			throw new AccessException(AccessErrorType.INVALID_DATA,
-					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
-		}
+		verifySessionId(session);
 
 		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
 		logger.debug("decision request: host = " + decisionEndpoint + ", parameters = " + parameters.toString());
@@ -305,6 +299,13 @@ public class AccessSdk {
 		}
 
 		return null;
+	}
+
+	private void verifySessionId(String session) throws AccessException {
+		if (null == session || session.length() != 32) {
+			throw new AccessException(AccessErrorType.INVALID_DATA,
+					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
+		}
 	}
 
 	private List<NameValuePair> createRequestParameters(String session, String username, String password,
@@ -481,8 +482,7 @@ public class AccessSdk {
 		}
 		return null;
 	}
-	
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Methods that require mocks when testing
@@ -516,7 +516,6 @@ public class AccessSdk {
 	CloseableHttpClient getHttpClient() {
 		return HttpClients.createDefault();
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	//
