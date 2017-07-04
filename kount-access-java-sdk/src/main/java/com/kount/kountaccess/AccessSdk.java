@@ -1,19 +1,19 @@
 package com.kount.kountaccess;
 
-import com.kount.kountaccess.AccessException.AccessErrorType;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -26,6 +26,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
+import com.kount.kountaccess.AccessException.AccessErrorType;
+
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
  * The AccessSdk module contains functions for a client to call the Kount Access API Service.
@@ -45,11 +50,13 @@ import org.apache.http.util.EntityUtils;
  */
 public class AccessSdk {
 
+	private static final Log logger = LogFactory.getLog(AccessSdk.class);
+
 	/**
 	 * This is the default version of the API Responses that this SDK will request. Future versions are intended to be
 	 * compatible with this version of the SDK.
 	 */
-	final String DEFAULT_API_VERSION = "0210";
+	public final String DEFAULT_API_VERSION = "0210";
 
 	/**
 	 * Merchant's ID
@@ -70,12 +77,12 @@ public class AccessSdk {
 	 * Version of the API response to use.
 	 */
 	private String version;
-	
+
 	/**
 	 * Velocity endpoint
 	 */
 	private final String velocityEndpoint;
-	
+
 	/**
 	 * Decision endpoint
 	 */
@@ -85,7 +92,7 @@ public class AccessSdk {
 	 * Device endpoint
 	 */
 	private final String deviceEndpoint;
-	
+
 	/**
 	 * Creates an instance of the AccessSdk associated with a specific host and merchant.
 	 * 
@@ -119,10 +126,12 @@ public class AccessSdk {
 		this.velocityEndpoint = "https://" + host + "/api/velocity";
 		this.deviceEndpoint = "https://" + host + "/api/device";
 		this.decisionEndpoint = "https://" + host + "/api/decision";
-		
+
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
 		this.version = DEFAULT_API_VERSION;
+
+		logger.info("Access SDK using merchantId = " + this.merchantId + ", host = " + host);
 	}
 
 	/**
@@ -179,13 +188,15 @@ public class AccessSdk {
 	 */
 	public JSONObject getVelocity(String session, String username, String password,
 			Map<String, String> additionalParameters) throws AccessException {
-		
+
 		if (null == session || session.length() != 32) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
 		}
-		
+
 		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
+
+		logger.debug("velocity request: host = " + velocityEndpoint + ", parameters = " + parameters.toString());
 		String response = this.postRequest(velocityEndpoint, parameters);
 		if (response != null) {
 			return processJSONEntity(response);
@@ -193,7 +204,7 @@ public class AccessSdk {
 
 		return null;
 	}
-	
+
 	/**
 	 * Gets the device information for the session.
 	 *
@@ -234,6 +245,9 @@ public class AccessSdk {
 		}
 
 		String urlString = deviceEndpoint + parameters;
+
+		logger.debug("device info request: url = " + urlString);
+
 		String response = this.getRequest(urlString);
 		if (response != null) {
 			return processJSONEntity(response);
@@ -277,14 +291,14 @@ public class AccessSdk {
 	 */
 	public JSONObject getDecision(String session, String username, String password,
 			HashMap<String, String> additionalParameters) throws AccessException {
-		
+
 		if (null == session || session.length() != 32) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
 		}
-		
-		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
 
+		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
+		logger.debug("decision request: host = " + decisionEndpoint + ", parameters = " + parameters.toString());
 		String response = this.postRequest(decisionEndpoint, parameters);
 		if (response != null) {
 			return processJSONEntity(response);
@@ -293,13 +307,13 @@ public class AccessSdk {
 		return null;
 	}
 
-	private List<NameValuePair> createRequestParameters(
-			String session, String username, String password, Map<String, String> additionalParameters) {
-		
+	private List<NameValuePair> createRequestParameters(String session, String username, String password,
+			Map<String, String> additionalParameters) {
+
 		List<NameValuePair> values = new ArrayList<>();
 		values.add(new BasicNameValuePair("v", this.version));
 		values.add(new BasicNameValuePair("s", session));
-		
+
 		if (username != null) {
 			values.add(new BasicNameValuePair("uh", hashValue(username)));
 		}
@@ -309,14 +323,14 @@ public class AccessSdk {
 		if (null != username || null != password) {
 			values.add(new BasicNameValuePair("ah", hashValue(username + ":" + password)));
 		}
-		
+
 		// Add the additional parameters, if they exist.
 		if (additionalParameters != null) {
 			for (Map.Entry<String, String> entry : additionalParameters.entrySet()) {
 				values.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 		}
-		
+
 		return values;
 	}
 
@@ -329,7 +343,7 @@ public class AccessSdk {
 			String encoded = "Basic " + DatatypeConverter.printBase64Binary(header.getBytes("UTF8"));
 			return encoded;
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.warn("Could not create authorization header", e);
 		}
 		return null;
 	}
@@ -359,12 +373,9 @@ public class AccessSdk {
 				hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 			}
 			return new String(hexChars);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// ignoring
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// ignoring
-			e.printStackTrace();
+			logger.warn("Could not hash parameter value", e);
 		}
 
 		return null;
@@ -433,30 +444,20 @@ public class AccessSdk {
 	}
 
 	/**
-	 * Gets the HttpPost object by itself to we can mock it easier.
+	 * Processes the Response to generate a JSONObject.
 	 *
-	 * @return An HttpPost object
+	 * @param response
+	 *            The Http response data as a string
+	 * @return The access JSONObject or null.
 	 */
-	HttpPost getHttpPost(String url) throws IllegalArgumentException {
-		return new HttpPost(url);
-	}
-
-	/**
-	 * Gets the HttpGet object by itself to we can mock it easier.
-	 *
-	 * @return An HttpGet object
-	 */
-	HttpGet getHttpGet(String url) throws IllegalArgumentException {
-		return new HttpGet(url);
-	}
-
-	/**
-	 * Getting the httpclient by itself so we can mock it.
-	 *
-	 * @return A CloseableHttpClient object.
-	 */
-	CloseableHttpClient getHttpClient() {
-		return HttpClients.createDefault();
+	private JSONObject processJSONEntity(String response) throws AccessException {
+		JSONObject result = null;
+		try {
+			result = JSONObject.fromObject(response);
+		} catch (JSONException e) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Unable to parse response.");
+		}
+		return result;
 	}
 
 	/**
@@ -480,28 +481,46 @@ public class AccessSdk {
 		}
 		return null;
 	}
-
-	/**
-	 * Processes the Response to generate a JSONObject.
-	 *
-	 * @param response
-	 *            The Http response data as a string
-	 * @return The access JSONObject or null.
-	 */
-	private JSONObject processJSONEntity(String response) throws AccessException {
-		JSONObject result = null;
-		try {
-			result = JSONObject.fromObject(response);
-		} catch (JSONException e) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Unable to parse response.");
-		}
-		return result;
-	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Deprecated functions
+	// Methods that require mocks when testing
+	//
+	// Not present in documentation
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+	 * Gets the HttpPost object by itself to we can mock it easier.
+	 *
+	 * @return An HttpPost object
+	 */
+	HttpPost getHttpPost(String url) throws IllegalArgumentException {
+		return new HttpPost(url);
+	}
+
+	/*
+	 * Gets the HttpGet object by itself to we can mock it easier.
+	 *
+	 * @return An HttpGet object
+	 */
+	HttpGet getHttpGet(String url) throws IllegalArgumentException {
+		return new HttpGet(url);
+	}
+
+	/*
+	 * Getting the httpclient by itself so we can mock it.
+	 *
+	 * @return A CloseableHttpClient object.
+	 */
+	CloseableHttpClient getHttpClient() {
+		return HttpClients.createDefault();
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Deprecated methods
 	//
 	// Not present in documentation
 	//
@@ -521,7 +540,7 @@ public class AccessSdk {
 	public JSONObject getDeviceInfo(String session) throws AccessException {
 		return getDevice(session);
 	}
-	
+
 	/**
 	 * Gets the velocity data for the session's username and password.
 	 *
@@ -563,7 +582,7 @@ public class AccessSdk {
 			Map<String, String> additionalParams) throws AccessException {
 		return getVelocity(session, username, password, additionalParams);
 	}
-	
+
 	/**
 	 * Get the help page for getDeviceInfo
 	 *
@@ -578,8 +597,8 @@ public class AccessSdk {
 
 	/**
 	 * Get the help page for getDevice
-     *
-     * @deprecated
+	 *
+	 * @deprecated
 	 * 
 	 * @return HTML String.
 	 * @throws AccessException
@@ -604,8 +623,8 @@ public class AccessSdk {
 
 	/**
 	 * Get the help page for getVelocity.
-     *
-     * @deprecated
+	 *
+	 * @deprecated
 	 * 
 	 * @return HTML String.
 	 * @throws AccessException
@@ -621,8 +640,8 @@ public class AccessSdk {
 
 	/**
 	 * Get the help page for getVelocity.
-     *
-     * @deprecated
+	 *
+	 * @deprecated
 	 * 
 	 * @return HTML String.
 	 * @throws AccessException
