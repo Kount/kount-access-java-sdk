@@ -96,16 +96,8 @@ public class AccessSDKTest {
 			+ "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"plh\": 1, "
 			+ "            \"plm\": 1" + "        }" + "    }" + "}";
 
-	Set<String> entityTypes;
-
-	public AccessSDKTest() {
-		entityTypes = new HashSet<String>();
-		entityTypes.add("account");
-		entityTypes.add("device");
-		entityTypes.add("ip_address");
-		entityTypes.add("password");
-		entityTypes.add("user");
-	}
+	private static final Set<String> entityTypes = 
+			new HashSet<String>(Arrays.asList("account", "device", "ip_address", "password", "user"));
 
 	/**
 	 * Test method for {@link com.kount.kountaccess.AccessSdk#AccessSdk(java.lang.String, int, java.lang.String)}.
@@ -126,8 +118,7 @@ public class AccessSDKTest {
 	@Test
 	public void testConstructorAccessSDKMissingHost() {
 		try {
-			@SuppressWarnings("unused")
-			AccessSdk sdk = new AccessSdk(null, merchantId, apiKey);
+			new AccessSdk(null, merchantId, apiKey);
 			fail("Should have failed host");
 
 		} catch (AccessException ae) {
@@ -141,8 +132,7 @@ public class AccessSDKTest {
 	@Test
 	public void testConstructorAccessSDKBadMerchant() {
 		try {
-			@SuppressWarnings("unused")
-			AccessSdk sdk = new AccessSdk(host, -1, apiKey);
+			new AccessSdk(host, -1, apiKey);
 			fail("Should have failed merchantId");
 
 		} catch (AccessException ae) {
@@ -156,8 +146,7 @@ public class AccessSDKTest {
 	@Test
 	public void testConstructorAccessSDKMissingApiKey() {
 		try {
-			@SuppressWarnings("unused")
-			AccessSdk sdk = new AccessSdk(host, merchantId, null);
+			new AccessSdk(host, merchantId, null);
 			fail("Should have failed apiKey");
 
 		} catch (AccessException ae) {
@@ -171,8 +160,7 @@ public class AccessSDKTest {
 	@Test
 	public void testConstructorAccessSDKBlankApiKey() {
 		try {
-			@SuppressWarnings("unused")
-			AccessSdk sdk = new AccessSdk(host, merchantId, "    ");
+			new AccessSdk(host, merchantId, "    ");
 			fail("Should have failed apiKey");
 
 		} catch (AccessException ae) {
@@ -239,8 +227,7 @@ public class AccessSDKTest {
 			AccessSdk sdk = spy(new AccessSdk("whetever is bad", merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			@SuppressWarnings("unused")
-			JSONObject accessInfo = sdk.getVelocity(session, user, password);
+			sdk.getVelocity(session, user, password);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -261,8 +248,7 @@ public class AccessSDKTest {
 			AccessSdk sdk = spy(new AccessSdk("gty://bad.host.com", merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			@SuppressWarnings("unused")
-			JSONObject accessInfo = sdk.getVelocity(session, user, password);
+			sdk.getVelocity(session, user, password);
 			fail("AccessException Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.NETWORK_ERROR, ae.getAccessErrorType());
@@ -287,8 +273,7 @@ public class AccessSDKTest {
 			AccessSdk sdk = spy(new AccessSdk("bad.host.com", merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			@SuppressWarnings("unused")
-			JSONObject accessInfo = sdk.getVelocity(session, user, password);
+			sdk.getVelocity(session, user, password);
 			fail("AccessException Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.NETWORK_ERROR, ae.getAccessErrorType());
@@ -313,8 +298,7 @@ public class AccessSDKTest {
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
 			when(mockHttpClient.execute((HttpPost) anyObject())).thenThrow(new UnknownHostException());
-			@SuppressWarnings("unused")
-			JSONObject accessInfo = sdk.getVelocity(session, user, password);
+			sdk.getVelocity(session, user, password);
 			fail("AccessException Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.NETWORK_ERROR, ae.getAccessErrorType());
