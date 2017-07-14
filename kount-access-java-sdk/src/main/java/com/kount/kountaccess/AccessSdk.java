@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +95,7 @@ public class AccessSdk {
 	 * Creates an instance of the AccessSdk associated with a specific host and merchant.
 	 * 
 	 * @param host
-	 *            FQDN of the host that AccessSdk will talk to.
+	 *            FQDN of the host that AccessSdk will communicate with.
 	 * @param merchantId
 	 *            Merchant ID (6 digit value).
 	 * @param apiKey
@@ -132,7 +131,7 @@ public class AccessSdk {
 
 		logger.info("Access SDK using merchantId = " + this.merchantId + ", host = " + host);
 		logger.debug("velocity endpoint: " + velocityEndpoint);
-		logger.debug("decisionendpoint: " + decisionEndpoint);
+		logger.debug("decision endpoint: " + decisionEndpoint);
 		logger.debug("device endpoint: " + deviceEndpoint);
 	}
 
@@ -140,7 +139,7 @@ public class AccessSdk {
 	 * Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
 	 * 
 	 * @param host
-	 *            FQDN of the host that AccessSdk will talk to.
+	 *            FQDN of the host that AccessSdk will communicate with.
 	 * @param merchantId
 	 *            Merchant ID (6 digit value).
 	 * @param apiKey
@@ -159,7 +158,7 @@ public class AccessSdk {
 	 * Gets the access (velocity) data for the session's username and password.
 	 *
 	 * @param session
-	 *            The Session ID returned from the Javascript data collector client SDK.
+	 *            The Session ID generated for the Data Collector service.
 	 * @param username
 	 *            The username of the user.
 	 * @param password
@@ -177,7 +176,7 @@ public class AccessSdk {
 	 * parameters.
 	 *
 	 * @param session
-	 *            The Session ID returned from the Javascript data collector client SDK
+	 *            The Session ID generated for the Data Collector service.
 	 * @param username
 	 *            The username of the user.
 	 * @param password
@@ -208,7 +207,7 @@ public class AccessSdk {
 	 * Gets the device information for the session.
 	 *
 	 * @param session
-	 *            The session to lookup
+	 *            The Session ID generated for the Data Collector service.
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
 	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
@@ -221,12 +220,12 @@ public class AccessSdk {
 	 * Gets the device information for the session. Contains argument for passing additional parameters.
 	 *
 	 * @param session
-	 *            The session to lookup
+	 *            The Session ID generated for the Data Collector service.
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
 	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
-	public JSONObject getDevice(String session, HashMap<String, String> additionalParameters) throws AccessException {
+	public JSONObject getDevice(String session, Map<String, String> additionalParameters) throws AccessException {
 
 		verifySessionId(session);
 
@@ -257,7 +256,7 @@ public class AccessSdk {
 	 * Gets the threshold decision and velocity data for the session's username and password.
 	 *
 	 * @param session
-	 *            The Session ID returned from the Javascript data collector client SDK.
+	 *            The Session ID generated for the Data Collector service.
 	 * @param username
 	 *            The username of the user.
 	 * @param password
@@ -275,7 +274,7 @@ public class AccessSdk {
 	 * passing additional parameters.
 	 *
 	 * @param session
-	 *            The Session ID returned from the Javascript data collector client SDK.
+	 *            The Session ID generated for the Data Collector service.
 	 * @param username
 	 *            The username of the user.
 	 * @param password
@@ -336,7 +335,7 @@ public class AccessSdk {
 	}
 
 	/**
-	 * Converts the auth header.
+	 * Creates the authentication header.
 	 */
 	private String getAuthorizationHeader() {
 		String header = merchantId + ":" + apiKey;
