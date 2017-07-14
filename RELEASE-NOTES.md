@@ -1,6 +1,6 @@
 kount-access-java-sdk 2.1.1
 ===========================
-**07/05/2017**
+**07/14/2017**
 
 ### New features
 * added maven
@@ -11,5 +11,3 @@ kount-access-java-sdk 2.1.1
 * code cleaned and updated for JDK/JRE 1.7
 
 ### Bugfixes
--
-
