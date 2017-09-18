@@ -36,7 +36,7 @@ import net.sf.json.JSONObject;
  * In order to use the SDK, you must construct it using three valid fields:
  * <ul>
  * <li>host - The fully qualified host name of the Kount Access server you are connecting to. (e.g.,
- * api-sandbox1.kountaccess.com)</li>
+ * api-sandbox01.kountaccess.com)</li>
  * <li>merchantId - The Kount assigned merchant number (six digits)</li>
  * <li>apiKey - The API key assigned to the merchant.</li>
  * </ul>
