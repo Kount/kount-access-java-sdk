@@ -1,24 +1,38 @@
-# Kount Access Java SDK Repository
+# Kount Access API SDK
 
-This repository contains the Kount Access Java SDK.
+## Overview
 
-Kount Access™ is designed for high-volume login, account creation and affiliate networks. Cross-checking individual component with several other components to calculate the velocity of related login attempts. And providing the client with dozens of velocity checks and essential data to help determine the legitimacy of the user and account owners.
+**Kount Access** is here to help you fight login fraud.  It's designed for high-volume and targeted for account creation and affiliate networks.  It cross-checks individual components with several other components to calculate the velocity of related login attempts, and provides you with dozens of velocity checks and essential data to help determine the legitimacy of the user and account owners.
 
-Downloads and use
------------------
+After your user submits their credentials for login (data collection is completed), you can request:
+* information about the device
+* velocity details (the tallies of credential combinations used) about the user's login attempt(s)
+* an automated decision to approve the login, based on tolerances you set based on velocity
 
-Clone the repository if you want to have a latest-and-greatest version of the Kount Access SDK, or just Download a stable release from the Releases page.
+Each response is returned in JSON format.
+This information enables you to make business decisions on how your site should to proceed with a user's login.
 
-Build the SDK jar by running:
-```bash
-mvn clean install
-```
+The **Kount Access API SDK** is used directly in your website (or authentication service) that handles user login.
+The Kount Access API SDK should be integrated into the client code so that it is called
+after the user submits their login, typically where the login form `POST` is handled.
+This will be used regardless of whether the login is successful or not.
 
-Use the jar you just built by referring it into your Maven configuration as:
-```xml
-<dependency>
-  <groupId>com.kount.kountaccess</groupId>
-  <artifactId>kount-access-java-sdk</artifactId>
-  <version>*the latest version number here*</version>
-</dependency>
-```
+For more information on what Kount Access is, go to http://www.kount.com
+
+## Requirements
+
+Ensure you have the information needed to instantiate the library in your app.
+
+*  **merchant ID** - Your merchant ID provided to you from Kount.
+*  **API Key** - The API key you generated from Kount (or was provided to you).
+*  **Server Name** - The DNS name of the server you want to connect. These are also provided by Kount.  You should have one server assigned for testing and one for production.
+*  **version** - The version of the API to access (defaults to the current version).  The version is in the form of a 4 digit string.
+
+## Supported Versions
+
+Kount Access API Versions:
+
+* 0200
+* 0210 (default)
+
+For more information on using this library, consult the wiki section.
