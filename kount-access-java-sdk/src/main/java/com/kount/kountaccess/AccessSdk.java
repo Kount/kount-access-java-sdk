@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ import net.sf.json.JSONObject;
  * <p>
  *
  * @author custserv@kount.com
- * 
+ *
  * @version 2.1.0
  */
 public class AccessSdk {
@@ -91,9 +92,20 @@ public class AccessSdk {
 	 */
 	private final String deviceEndpoint;
 
+    /**
+     * Device trust endpoint
+     */
+    private final String deviceTrustEndpoint;
+
+    /**
+     * Device information endpoint
+     *
+     */
+    private final String deviceInfoEndpoint;
+
 	/**
 	 * Creates an instance of the AccessSdk associated with a specific host and merchant.
-	 * 
+	 *
 	 * @param host
 	 *            FQDN of the host that AccessSdk will communicate with.
 	 * @param merchantId
@@ -124,6 +136,8 @@ public class AccessSdk {
 		this.velocityEndpoint = "https://" + host + "/api/velocity";
 		this.deviceEndpoint = "https://" + host + "/api/device";
 		this.decisionEndpoint = "https://" + host + "/api/decision";
+        this.deviceTrustEndpoint = "https://" + host + "/api/devicetrust";
+        this.deviceInfoEndpoint = "https://" + host + "/api/info";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -133,11 +147,13 @@ public class AccessSdk {
 		logger.debug("velocity endpoint: " + velocityEndpoint);
 		logger.debug("decision endpoint: " + decisionEndpoint);
 		logger.debug("device endpoint: " + deviceEndpoint);
+        logger.debug("device trust endpoint: " + deviceTrustEndpoint);
+        logger.debug("device info endpoint: " + deviceInfoEndpoint);
 	}
 
 	/**
 	 * Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
-	 * 
+	 *
 	 * @param host
 	 *            FQDN of the host that AccessSdk will communicate with.
 	 * @param merchantId
@@ -300,6 +316,89 @@ public class AccessSdk {
 		return null;
 	}
 
+	/**
+	 * Creates or updates the trust state for device using the TDI service.
+	 *
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+     * @param deviceId
+     *            The unique deviceId.
+     * @param uniq
+     *            Merchant assigned account number for the consumer.
+     * @param trustState
+     *            The state to set the device to.
+     *            Accepted values are: "T", "B", "N" (Trusted, Banned, or Not Trusted).
+	 * @return Http response code.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+	 */
+	public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
+        return setDeviceTrust(username, password, deviceId, uniq, trustState, null);
+    }
+
+	/**
+	 * Creates or updates the trust state for device using the TDI service.
+	 *
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+     * @param deviceId
+     *            The unique deviceId.
+     * @param uniq
+     *            Merchant assigned account number for the consumer.
+     * @param trustState
+     *            The state to set the device to.
+     *            Accepted values are: "T", "B", "N" (Trusted, Banned, or Not Trusted).
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return Http response code.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+	 */
+	public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
+
+		List<NameValuePair> parameters = createRequestParameters(null, username, password, additionalParameters);
+        verifyTrustState(trustState);
+        verifyUniq(uniq);
+        verifyDeviceId(deviceId);
+
+        parameters.add(new BasicNameValuePair("ts", trustState));
+
+		logger.debug("device trust request: host = " + deviceTrustEndpoint + ", parameters = " + parameters.toString());
+		String response = this.postRequest(deviceTrustEndpoint, parameters);
+
+		if (response != null) {
+			return response;
+        }
+
+		return null;
+	}
+
+    private void verifyDeviceId(String deviceId) throws AccessException {
+        if (null == deviceId || deviceId.length() != 32) {
+            throw new AccessException(AccessErrorType.INVALID_DATA,
+                    "Invalid deviceId (" + deviceId + ").  Must be 32 characters in length");
+        }
+    }
+
+    private void verifyTrustState(String trustState) throws AccessException {
+        final String validTDI[] = {"trusted", "banned", "not_trusted" };
+        if (null == trustState || !(Arrays.asList(validTDI).contains(trustState.toLowerCase()))) {
+            throw new AccessException(AccessErrorType.INVALID_DATA,
+                    "Invalid device trust state (" + trustState +"). Must be one of " + Arrays.toString(validTDI));
+        }
+    }
+
+    private void verifyUniq(String uniq) throws AccessException {
+        if (uniq.length() > 32) {
+			throw new AccessException(AccessErrorType.INVALID_DATA,
+					"Invalid uniq value (" + uniq + ").  Must not exceed 32 characters in length");
+        }
+    }
+
 	private void verifySessionId(String session) throws AccessException {
 		if (null == session || session.length() != 32) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
@@ -312,9 +411,11 @@ public class AccessSdk {
 
 		List<NameValuePair> values = new ArrayList<>();
 		values.add(new BasicNameValuePair("v", this.version));
-		values.add(new BasicNameValuePair("s", session));
 
-		if (username != null) {
+        if (session != null) {
+		    values.add(new BasicNameValuePair("s", session));
+        }
+		if (null != username) {
 			values.add(new BasicNameValuePair("uh", hashValue(username)));
 		}
 		if (null != password) {
