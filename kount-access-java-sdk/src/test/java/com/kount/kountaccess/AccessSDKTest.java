@@ -398,14 +398,13 @@ public class AccessSDKTest {
 
             doReturn(mockResponse).when(mockHttpClient).execute((HttpPost) anyObject());
             doReturn(mockHttpClient).when(sdk).getHttpClient();
-            doReturn("").when(sdk).getResponseAsString(mockResponse);
+            doReturn(null).when(sdk).getResponseAsString(mockResponse);
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();
 
-            String response = sdk.setDeviceTrust(user, password, fingerprint, uniq, "trusted");
+            JSONObject response = sdk.setDeviceTrust(user, password, fingerprint, uniq, "trusted");
             logger.debug(response);
-            assertTrue(response != null);
-            assertEquals(response, "");
+            assertTrue(response == null);
         } catch (IOException ioe) {
             fail("Exception:" + ioe.getMessage());
         } catch (AccessException ae) {

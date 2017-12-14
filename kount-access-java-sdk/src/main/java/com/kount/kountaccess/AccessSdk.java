@@ -334,7 +334,7 @@ public class AccessSdk {
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
+    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
         return setDeviceTrust(username, password, deviceId, uniq, trustState, null);
     }
 
@@ -358,7 +358,7 @@ public class AccessSdk {
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
+    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
 
         List<NameValuePair> parameters = createRequestParameters(null, username, password, additionalParameters);
         verifyTrustState(trustState);
@@ -371,7 +371,7 @@ public class AccessSdk {
         String response = this.postRequest(deviceTrustEndpoint, parameters);
 
         if (response != null) {
-            return response;
+            return processJSONEntity(response);
         }
 
         return null;
