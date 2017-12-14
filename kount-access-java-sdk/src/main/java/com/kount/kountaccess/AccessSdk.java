@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 /**
  * The AccessSdk module contains functions for a client to call the Kount Access API Service.
@@ -45,7 +45,7 @@ import net.sf.json.JSONObject;
  *
  * @author custserv@kount.com
  *
- * @version 2.1.0
+ * @version 3.2.0
  */
 public class AccessSdk {
 
@@ -55,7 +55,7 @@ public class AccessSdk {
      * This is the default version of the API Responses that this SDK will request. Future versions are intended to be
      * compatible with this version of the SDK.
      */
-    public final String DEFAULT_API_VERSION = "0210";
+    public final String DEFAULT_API_VERSION = "0320";
 
     /**
      * Merchant's ID
@@ -317,25 +317,121 @@ public class AccessSdk {
     }
 
     /**
-     * Creates or updates the trust state for device using the TDI service.
+     * Gathers multiple points of data about a specific device based on the requested return value.
+     * Device data that can be requested: deviceInfo, velocity, threshold, and the trusted device state.
+     * Depending on the data requested, different parameters will be required.
      *
+     * @param session
+     *            Required for all requests.
+     *            The Session ID generated for the Data Collector service.
      * @param username
+     *            Required for velocity and threshold requests.
      *            The username of the user.
      * @param password
+     *            Required for velocity and threshold requests.
      *            The password of the user.
+     * @param returnValue
+     *            Required for all requests.
+     *            The value that will map to what data is requested; 1-15
+     *
+     *            ------------------------------------------------------------------
+     *            | returnvalue | deviceInfo | velocity | threshold | trusted state |
+     *            ------------------------------------------------------------------
+     *            |      1      |     Y      |    N     |     N     |       N       |
+     *            |      2      |     N      |    Y     |     N     |       N       |
+     *            |      3      |     Y      |    Y     |     N     |       N       |
+     *            |      4      |     N      |    N     |     Y     |       N       |
+     *            |      5      |     Y      |    N     |     Y     |       N       |
+     *            |      6      |     N      |    Y     |     Y     |       N       |
+     *            |      7      |     Y      |    Y     |     Y     |       N       |
+     *            |      8      |     N      |    N     |     N     |       Y       |
+     *            |      9      |     Y      |    N     |     N     |       Y       |
+     *            |     10      |     N      |    Y     |     N     |       Y       |
+     *            |     11      |     Y      |    Y     |     N     |       Y       |
+     *            |     12      |     N      |    N     |     Y     |       Y       |
+     *            |     13      |     Y      |    N     |     Y     |       Y       |
+     *            |     14      |     N      |    Y     |     Y     |       Y       |
+     *            |     15      |     Y      |    Y     |     Y     |       Y       |
+     *            ------------------------------------------------------------------
+     *
      * @param deviceId
+     *            Required for all requests.
      *            The unique deviceId.
      * @param uniq
+     *            Required for trusted state requests.
      *            Merchant assigned account number for the consumer.
-     * @param trustState
-     *            The state to set the device to.
-     *            Accepted values are: "T", "B", "N" (Trusted, Banned, or Not Trusted).
      * @return Http response code.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
-        return setDeviceTrust(username, password, deviceId, uniq, trustState, null);
+    public JSONObject gatherDeviceInfo(String session, String username, String password,
+                                       String returnValue, String deviceId, String uniq) throws AccessException {
+        return gatherDeviceInfo(session, username, password, returnValue, deviceId, uniq, null);
+    }
+
+    /**
+     * Gathers multiple points of data about a specific device based on the requested return value. Contains argument for passing additional
+     * parameters.
+     *
+     * @param session
+     *            Required for all requests.
+     *            The Session ID generated for the Data Collector service.
+     * @param username
+     *            Required for velocity and threshold requests.
+     *            The username of the user.
+     * @param password
+     *            Required for velocity and threshold requests.
+     *            The password of the user.
+     * @param returnValue
+     *            Required for all requests.
+     *            The value that will map to what data is requested; 1-15
+     *
+     *            ------------------------------------------------------------------
+     *            | returnvalue | deviceInfo | velocity | threshold | trusted state |
+     *            ------------------------------------------------------------------
+     *            |      1      |     Y      |    N     |     N     |       N       |
+     *            |      2      |     N      |    Y     |     N     |       N       |
+     *            |      3      |     Y      |    Y     |     N     |       N       |
+     *            |      4      |     N      |    N     |     Y     |       N       |
+     *            |      5      |     Y      |    N     |     Y     |       N       |
+     *            |      6      |     N      |    Y     |     Y     |       N       |
+     *            |      7      |     Y      |    Y     |     Y     |       N       |
+     *            |      8      |     N      |    N     |     N     |       Y       |
+     *            |      9      |     Y      |    N     |     N     |       Y       |
+     *            |     10      |     N      |    Y     |     N     |       Y       |
+     *            |     11      |     Y      |    Y     |     N     |       Y       |
+     *            |     12      |     N      |    N     |     Y     |       Y       |
+     *            |     13      |     Y      |    N     |     Y     |       Y       |
+     *            |     14      |     N      |    Y     |     Y     |       Y       |
+     *            |     15      |     Y      |    Y     |     Y     |       Y       |
+     *            ------------------------------------------------------------------
+     *
+     * @param deviceId
+     *            Required for all requests.
+     *            The unique deviceId.
+     * @param uniq
+     *            Required for trusted state requests.
+     *            Merchant assigned account number for the consumer.
+     * @param additionParameters
+     *            Additional parameters to send to server.
+     * @return Http response code.
+     * @throws AccessException
+     *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+     */
+    public JSONObject gatherDeviceInfo(String session, String username, String password,
+            String returnValue, String deviceId, String uniq, Map<String, String> additionalParameters) throws AccessException {
+
+        List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
+        verifyGatherInfoParameters(session, returnValue, deviceId, uniq);
+
+        logger.debug("gather device info request: host = " + deviceInfoEndpoint + ", parameters = " + parameters.toString());
+        String response = this.postRequest(deviceInfoEndpoint, parameters);
+
+        if (response != null) {
+            return processJSONEntity(response);
+        }
+
+        return null;
     }
 
     /**
@@ -351,14 +447,37 @@ public class AccessSdk {
      *            Merchant assigned account number for the consumer.
      * @param trustState
      *            The state to set the device to.
-     *            Accepted values are: "T", "B", "N" (Trusted, Banned, or Not Trusted).
+     *            Accepted values are: "trusted", "banned", or "not_trusted".
+     * @return Http response code.
+     * @throws AccessException
+     *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+     */
+    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
+        return setDeviceTrust(username, password, deviceId, uniq, trustState, null);
+    }
+
+    /**
+     * Creates or updates the trust state for device using the TDI service. Contains argument for passing additional
+     * parameters.
+     *
+     * @param username
+     *            The username of the user.
+     * @param password
+     *            The password of the user.
+     * @param deviceId
+     *            The unique deviceId.
+     * @param uniq
+     *            Merchant assigned account number for the consumer.
+     * @param trustState
+     *            The state to set the device to.
+     *            Accepted values are: "trusted", "banned", or "not_trusted".
      * @param additionalParameters
      *            Additional parameters to send to server.
      * @return Http response code.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public String setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
+    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
 
         List<NameValuePair> parameters = createRequestParameters(null, username, password, additionalParameters);
         verifyTrustState(trustState);
@@ -371,16 +490,54 @@ public class AccessSdk {
         String response = this.postRequest(deviceTrustEndpoint, parameters);
 
         if (response != null) {
-            return response;
+            return processJSONEntity(response);
         }
 
         return null;
     }
 
+    private void verifyReturnValue(String returnValue) throws AccessException {
+        final int bitMin = 1;
+        final int bitMax = 15;
+        int rValue = Integer.valueOf(returnValue);
+        if (null == returnValue || rValue > bitMax || rValue < bitMin) {
+            throw new AccessException(AccessErrorType.INVALID_DATA,
+                    String.format("Invalid returnValue (%s).  Must be an integer between %d and %d", returnValue, bitMin, bitMax));
+        }
+    }
+
+    // Check we have the right parameters passed for the information requested.
+    private void verifyGatherInfoParameters(String session, String returnValue, String deviceId, String uniq) throws AccessException {
+        int deviceInfoBits   = 0b0001;
+        int velocityBits     = 0b0010;
+        int thresholdBits    = 0b0100;
+        int trustedStateBits = 0b1000;
+        int returnBits   = Integer.parseInt(returnValue);
+
+        // Everything needs these, check we have them
+        verifySessionId(session);
+        verifyReturnValue(returnValue);
+        verifyDeviceId(deviceId);
+
+        if ((deviceInfoBits & returnBits) == deviceInfoBits) {
+            logger.debug("gatherDeviceInfo requested deviceInfo");
+        }
+        if ((velocityBits & returnBits) == velocityBits) {
+            logger.debug("gatherDeviceInfo requested velocity");
+        }
+        if ((thresholdBits & returnBits) == thresholdBits) {
+            logger.debug("gatherDeviceInfo requested threshold");
+        }
+        if ((trustedStateBits & returnBits) == trustedStateBits) {
+            logger.debug("gatherDeviceInfo requested trustedState");
+            verifyUniq(uniq);
+        }
+    }
+
     private void verifyDeviceId(String deviceId) throws AccessException {
         if (null == deviceId || deviceId.length() != 32) {
             throw new AccessException(AccessErrorType.INVALID_DATA,
-                    "Invalid deviceId (" + deviceId + ").  Must be 32 characters in length");
+                    String.format("Invalid deviceId ().  Must be 32 characters in length", deviceId));
         }
     }
 
@@ -554,7 +711,7 @@ public class AccessSdk {
     private JSONObject processJSONEntity(String response) throws AccessException {
         JSONObject result = null;
         try {
-            result = JSONObject.fromObject(response);
+            result = new JSONObject(response);
         } catch (JSONException e) {
             throw new AccessException(AccessErrorType.INVALID_DATA, "Unable to parse response.");
         }
@@ -671,14 +828,14 @@ public class AccessSdk {
      *            The username of the user.
      * @param password
      *            The password of the user.
-     * @param additionalParams
+     * @param additionalParameters
      *            Additional parameters to send to server.
      * @return A JSONObject containing the response.
      * @throws AccessException
      *             Thrown if any of the param values are invalid or there was a problem getting a response.
      */
     public JSONObject getAccessData(String session, String username, String password,
-            Map<String, String> additionalParams) throws AccessException {
-        return getVelocity(session, username, password, additionalParams);
+            Map<String, String> additionalParameters) throws AccessException {
+        return getVelocity(session, username, password, additionalParameters);
     }
 }
