@@ -10,9 +10,9 @@ import net.sf.json.JSONObject;
  * This is an example implementation of the Kount Access API SDK. In this example we will show how to create, prepare,
  * and make requests to the Kount Access API, and what to expect as a result. Before you can make API requests, you'll
  * need to have made collector request(s) prior, and you'll have to use the session id(s) that were returned.
- * 
+ *
  * @author custserv@kount.com
- * @version 2.1.0
+ * @version 3.2.0
  * @copyright 2015 Kount, Inc. All Rights Reserved.
  */
 public class KountAccessExample {

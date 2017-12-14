@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * Unit Tests around the Access SDK
  *
- * @author gjd, abe
+ * @author gjd, abe, cwm
  *
  */
 public class AccessSDKTest {
@@ -48,6 +48,7 @@ public class AccessSDKTest {
     String responseId = "bf10cd20cf61286669e87342d029e405";
     String decision = "A";
     String uniq = "uniqUserAccounUserAccountt";
+    String returnValue = "15";
 
     String velocityJSON = "{" + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
             + "        \"ipAddress\": \"" + ipAddress + "\", " + "        \"ipGeo\": \"" + ipGeo + "\", "
@@ -74,7 +75,7 @@ public class AccessSDKTest {
             + "        \"mobile\": 1, " + "        \"proxy\": 0" + "    }," + "    \"response_id\": \"" + responseId
             + "\"" + "}";
 
-    String decisionJSON = "{" + "   \"decision\": {" + "       \"errors\": []," + "       \"reply\": {"
+    String decisionJSON = "{   \"decision\": {" + "       \"errors\": []," + "       \"reply\": {"
             + "           \"ruleEvents\": {" + "               \"decision\": \"" + decision + "\","
             + "               \"ruleEvents\": []," + "               \"total\": 0" + "           }" + "       },"
             + "       \"warnings\": []" + "   }," + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
@@ -95,7 +96,12 @@ public class AccessSDKTest {
             + "            \"ulm\": 1" + "        }, " + "        \"user\": {" + "            \"alh\": 1, "
             + "            \"alm\": 1, " + "            \"dlh\": 1, " + "            \"dlm\": 1, "
             + "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"plh\": 1, "
-            + "            \"plm\": 1" + "        }" + "    }" + "}";
+            + "            \"plm\": 1" + "        }" + "    }}";
+
+    String gatherDeviceInfoJSON = "{\"response_id\":\"" + responseId + "\",\"" +
+        "device\":{\"id\":\"" + fingerprint + "\",\"ipAddress\":\"" + ipAddress + "\",\"ipGeo\":\"" + ipGeo + "\",\"mobile\":0,\"proxy\":0,\"country\":\"A1\"},\"" +
+        "velocity\":{\"account\":{\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"device\":{\"alh\":1,\"alm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"ip_address\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"password\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"ulh\":1,\"ulm\":1},\"user\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1}},\"" +
+        "decision\":{\"errors\":[],\"warnings\":[{\"code\":\"WARNING\",\"message\":\"No thresholds enabled or configured\"}],\"reply\":{\"ruleEvents\":{\"decision\":\"A\",\"total\":0,\"ruleEvents\":[]}}}}";
 
     private static final Set<String> entityTypes =
             new HashSet<String>(Arrays.asList("account", "device", "ip_address", "password", "user"));
@@ -416,7 +422,7 @@ public class AccessSDKTest {
      * Test method for {@link com.kount.kountaccess.AccessSdk#setDeviceTrust(String, String, String, String, String)}.
      */
     @Test
-    public void testSetDeviceTrustIllegalTrustStateException() {
+    public void testSetDeviceBadIllegalTrustState() {
 
         try {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
@@ -436,7 +442,7 @@ public class AccessSDKTest {
      * Test method for {@link com.kount.kountaccess.AccessSdk#setDeviceTrust(String, String, String, String, String)}.
      */
     @Test
-    public void testSetDeviceTrustIllegalUniqException() {
+    public void testSetDeviceTrustBadUniq() {
 
         try {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
@@ -456,7 +462,7 @@ public class AccessSDKTest {
      * Test method for {@link com.kount.kountaccess.AccessSdk#setDeviceTrust(String, String, String, String, String)}.
      */
     @Test
-    public void testSetDeviceTrustIllegalDeviceIdException() {
+    public void testSetDeviceTrustBadDeviceId() {
 
         try {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
@@ -466,6 +472,150 @@ public class AccessSDKTest {
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
             sdk.setDeviceTrust(user, password, "0123456789abcdefghijklmnopqrstuvwxyz", uniq, "trusted");
+            fail("AccessException not thrown");
+        } catch (AccessException ae) {
+            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testGatherDeviceInfoHappyPath() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+            CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
+            StatusLine mockStatus = mock(StatusLine.class);
+
+            doReturn(mockResponse).when(mockHttpClient).execute((HttpPost) anyObject());
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+            doReturn(gatherDeviceInfoJSON).when(sdk).getResponseAsString(mockResponse);
+            doReturn(mockStatus).when(mockResponse).getStatusLine();
+            doReturn(200).when(mockStatus).getStatusCode();
+
+            JSONObject deviceInfo = sdk.gatherDeviceInfo(session, user, password, returnValue, fingerprint, uniq);
+            logger.debug(deviceInfo);
+
+            JSONObject device = deviceInfo.getJSONObject("device");
+            assertTrue(device != null);
+            assertEquals(fingerprint, device.get("id"));
+
+            JSONObject decision = deviceInfo.getJSONObject("decision");
+            assertTrue(decision != null);
+
+            JSONObject velocity = deviceInfo.getJSONObject("velocity");
+            assertTrue(velocity != null);
+        } catch (IOException ioe) {
+            fail("Exception:" + ioe.getMessage());
+        } catch (AccessException ae) {
+            fail("Exception:" + ae.getMessage());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testBadReturnValueLessThanGatherDeviceInfo() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+
+            sdk.gatherDeviceInfo(session, user, password, "-1", fingerprint, uniq);
+            fail("AccessException not thrown");
+        } catch (AccessException ae) {
+            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testBadReturnValueGreaterThanGatherDeviceInfo() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+
+            sdk.gatherDeviceInfo(session, user, password, "16", fingerprint, uniq);
+            fail("AccessException not thrown");
+        } catch (AccessException ae) {
+            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testBadSessionGatherDeviceInfo() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+
+            sdk.gatherDeviceInfo("badSessionID", user, password, returnValue, fingerprint, uniq);
+            fail("AccessException not thrown");
+        } catch (AccessException ae) {
+            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testBadUniqGatherDeviceInfo() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+
+            sdk.gatherDeviceInfo(session, user, password, returnValue, fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz");
+            fail("AccessException not thrown");
+        } catch (AccessException ae) {
+            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+        }
+    }
+
+    /**
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     */
+    @Test
+    public void testBadDeviceIdGatherDeviceInfo() {
+
+        try {
+            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+
+            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+            HttpPost mockPost = mock(HttpPost.class);
+
+            doReturn(mockHttpClient).when(sdk).getHttpClient();
+
+            sdk.gatherDeviceInfo(session, user, password, returnValue, "0123456789abcdefghijklmnopqrstuvwxyz", uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
