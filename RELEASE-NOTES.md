@@ -1,3 +1,16 @@
+kount-access-java-sdk 2.1.2
+===========================
+**12/28/2017**
+
+### New features
+* Added /info and TDI support
+* Bumped to version 0320
+
+### Improvements
+* Cleaned up JSON useage in tests
+
+### Bugfixes
+
 kount-access-java-sdk 2.1.1
 ===========================
 **07/14/2017**

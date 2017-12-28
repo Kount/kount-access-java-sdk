@@ -49,7 +49,6 @@ public class AccessSDKTest {
     String responseId = "bf10cd20cf61286669e87342d029e405";
     String decision = "A";
     String uniq = "uniqUserAccounUserAccountt";
-    String returnValue = "15";
 
     String deviceJSON = new JSONObject()
         .put("response_id", responseId)
@@ -574,7 +573,7 @@ public class AccessSDKTest {
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();
 
-            JSONObject deviceInfo = sdk.gatherDeviceInfo(session, user, password, returnValue, fingerprint, uniq);
+            JSONObject deviceInfo = sdk.gatherDeviceInfo(session, user, password, "15", fingerprint, uniq);
             logger.debug(deviceInfo);
 
             JSONObject device = deviceInfo.getJSONObject("device");
@@ -649,7 +648,7 @@ public class AccessSDKTest {
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo("badSessionID", user, password, returnValue, fingerprint, uniq);
+            sdk.gatherDeviceInfo("badSessionID", user, password, "15", fingerprint, uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -670,7 +669,7 @@ public class AccessSDKTest {
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo(session, user, password, returnValue, fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz");
+            sdk.gatherDeviceInfo(session, user, password, "15", fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz");
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -691,7 +690,7 @@ public class AccessSDKTest {
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo(session, user, password, returnValue, "0123456789abcdefghijklmnopqrstuvwxyz", uniq);
+            sdk.gatherDeviceInfo(session, user, password, "15", "0123456789abcdefghijklmnopqrstuvwxyz", uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
