@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 /**
  * The AccessSdk module contains functions for a client to call the Kount Access API Service.
@@ -711,7 +711,7 @@ public class AccessSdk {
     private JSONObject processJSONEntity(String response) throws AccessException {
         JSONObject result = null;
         try {
-            result = JSONObject.fromObject(response);
+            result = new JSONObject(response);
         } catch (JSONException e) {
             throw new AccessException(AccessErrorType.INVALID_DATA, "Unable to parse response.");
         }

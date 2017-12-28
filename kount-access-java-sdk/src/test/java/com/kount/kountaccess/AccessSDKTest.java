@@ -3,7 +3,6 @@
  */
 package com.kount.kountaccess;
 
-//import static org.junit.Assert.*;
 import static junit.framework.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -42,66 +41,143 @@ public class AccessSDKTest {
     String user = "greg@test.com";
     String password = "password";
     String apiKey = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIxMDAxMDAiLCJhdWQiOiJLb3VudC4wIiwiaWF0IjoxNDI0OTg5NjExLCJzY3AiOnsia2MiOm51bGwsImFwaSI6ZmFsc2UsInJpcyI6ZmFsc2V9fQ.S7kazxKVgDCrNxjuieg5ChtXAiuSO2LabG4gzDrh1x8";
+    String country = "US";
     String fingerprint = "75012bd5e5b264c4b324f5c95a769541";
     String ipAddress = "64.128.91.251";
     String ipGeo = "US";
+    String region = "ID";
     String responseId = "bf10cd20cf61286669e87342d029e405";
     String decision = "A";
     String uniq = "uniqUserAccounUserAccountt";
     String returnValue = "15";
 
-    String velocityJSON = "{" + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
-            + "        \"ipAddress\": \"" + ipAddress + "\", " + "        \"ipGeo\": \"" + ipGeo + "\", "
-            + "        \"mobile\": 1, " + "        \"proxy\": 0" + "    }, " + "    \"response_id\": \"" + responseId
-            + "\", " + "    \"velocity\": {" + "        \"account\": {" + "            \"dlh\": 1, "
-            + "            \"dlm\": 1, " + "            \"iplh\": 1, " + "            \"iplm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"device\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"iplh\": 1, " + "            \"iplm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"ip_address\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"dlh\": 1, " + "            \"dlm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"password\": {" + "           \"alh\": 1, "
-            + "           \"alm\": 1, " + "           \"dlh\": 1, " + "           \"dlm\": 1, "
-            + "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"user\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"dlh\": 1, " + "            \"dlm\": 1, "
-            + "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"plh\": 1, "
-            + "            \"plm\": 1" + "        }" + "    }" + "}";
+    String deviceJSON = new JSONObject()
+        .put("response_id", responseId)
+        .put("device", new JSONObject()
+                .put("country", country)
+                .put("id", fingerprint)
+                .put("ipAddress", ipAddress)
+                .put("ipGeo", ipGeo)
+                .put("mobile", 1)
+                .put("proxy", 0)
+                .put("region", region)
+        ).toString();
 
-    String deviceJSON = "{" + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
-            + "        \"ipAddress\": \"" + ipAddress + "\", " + "        \"ipGeo\": \"" + ipGeo + "\", "
-            + "        \"mobile\": 1, " + "        \"proxy\": 0" + "    }," + "    \"response_id\": \"" + responseId
-            + "\"" + "}";
+    String velocityJSON = new JSONObject()
+        .put("response_id", responseId)
+        .put("device", new JSONObject()
+                .put("country", country)
+                .put("id", fingerprint)
+                .put("ipAddress", ipAddress)
+                .put("ipGeo", ipGeo)
+                .put("mobile", 1)
+                .put("proxy", 0)
+                .put("region", region)
+        )
+        .put("velocity", new JSONObject()
+                .put("account", new JSONObject()
+                        .put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("device", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("ip_address", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("password", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("user", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1)
+                )
+        ).toString();
 
-    String decisionJSON = "{   \"decision\": {" + "       \"errors\": []," + "       \"reply\": {"
-            + "           \"ruleEvents\": {" + "               \"decision\": \"" + decision + "\","
-            + "               \"ruleEvents\": []," + "               \"total\": 0" + "           }" + "       },"
-            + "       \"warnings\": []" + "   }," + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
-            + "        \"ipAddress\": \"" + ipAddress + "\", " + "        \"ipGeo\": \"" + ipGeo + "\", "
-            + "        \"mobile\": 1, " + "        \"proxy\": 0" + "    }, " + "    \"response_id\": \"" + responseId
-            + "\", " + "    \"velocity\": {" + "        \"account\": {" + "            \"dlh\": 1, "
-            + "            \"dlm\": 1, " + "            \"iplh\": 1, " + "            \"iplm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"device\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"iplh\": 1, " + "            \"iplm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"ip_address\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"dlh\": 1, " + "            \"dlm\": 1, "
-            + "            \"plh\": 1, " + "            \"plm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"password\": {" + "           \"alh\": 1, "
-            + "           \"alm\": 1, " + "           \"dlh\": 1, " + "           \"dlm\": 1, "
-            + "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"ulh\": 1, "
-            + "            \"ulm\": 1" + "        }, " + "        \"user\": {" + "            \"alh\": 1, "
-            + "            \"alm\": 1, " + "            \"dlh\": 1, " + "            \"dlm\": 1, "
-            + "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"plh\": 1, "
-            + "            \"plm\": 1" + "        }" + "    }}";
+    String decisionJSON = new JSONObject()
+        .put("response_id", responseId)
+        .put("decision", new JSONObject()
+                .put("errors", "[]")
+                .put("reply", new JSONObject()
+                    .put("ruleEvents", new JSONObject()
+                        .put("decision", decision)
+                        .put("ruleEvents", "[]")
+                        .put("total", 0)
+                    )
+                    .put("warnings", "[]")
+                )
+        )
+        .put("device", new JSONObject()
+                .put("country", country)
+                .put("id", fingerprint)
+                .put("ipAddress", ipAddress)
+                .put("ipGeo", ipGeo)
+                .put("mobile", 1)
+                .put("proxy", 0)
+                .put("region", region)
+        )
+        .put("velocity", new JSONObject()
+                .put("account", new JSONObject()
+                        .put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("device", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("ip_address", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("password", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("user", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1)
+                )
+        ).toString();
 
-    String gatherDeviceInfoJSON = "{\"response_id\":\"" + responseId + "\",\"" +
-        "device\":{\"id\":\"" + fingerprint + "\",\"ipAddress\":\"" + ipAddress + "\",\"ipGeo\":\"" + ipGeo + "\",\"mobile\":0,\"proxy\":0,\"country\":\"A1\"},\"" +
-        "velocity\":{\"account\":{\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"device\":{\"alh\":1,\"alm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"ip_address\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"plh\":1,\"plm\":1,\"ulh\":1,\"ulm\":1},\"password\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"ulh\":1,\"ulm\":1},\"user\":{\"alh\":1,\"alm\":1,\"dlh\":1,\"dlm\":1,\"iplh\":1,\"iplm\":1,\"plh\":1,\"plm\":1}},\"" +
-        "decision\":{\"errors\":[],\"warnings\":[{\"code\":\"WARNING\",\"message\":\"No thresholds enabled or configured\"}],\"reply\":{\"ruleEvents\":{\"decision\":\"A\",\"total\":0,\"ruleEvents\":[]}}}}";
+    String gatherDeviceInfoJSON = new JSONObject()
+        .put("response_id", responseId)
+        .put("device", new JSONObject()
+                .put("country", country)
+                .put("id", fingerprint)
+                .put("ipAddress", ipAddress)
+                .put("ipGeo", ipGeo)
+                .put("mobile", 1)
+                .put("proxy", 0)
+                .put("region", region)
+        )
+        .put("velocity", new JSONObject()
+                .put("account", new JSONObject()
+                        .put("dlh", 1).put("dlm", 1).put("iplh", 1).put("iplm", 1)
+                        .put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("device", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("iplh", 1).put("iplm", 1)
+                        .put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("ip_address", new JSONObject()
+                        .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1)
+                        .put("plh", 1).put("plm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("password", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1)
+                    .put("iplh", 1).put("iplm", 1).put("ulh", 1).put("ulm", 1)
+                )
+                .put("user", new JSONObject()
+                    .put("alh", 1).put("alm", 1).put("dlh", 1).put("dlm", 1)
+                    .put("iplh", 1).put("iplm", 1).put("plh", 1).put("plm", 1)
+                )
+        )
+        .put("decision", new JSONObject()
+                .put("errors", "[]")
+                .put("warnings", ":[{\"code\":\"WARNING\",\"message\":\"No thresholds enabled or configured\"}]")
+                .put("reply", new JSONObject()
+                    .put("ruleEvents", new JSONObject()
+                        .put("decision", decision)
+                        .put("ruleEvents", "[]")
+                        .put("total", 0)
+                    )
+                    .put("warnings", "[]")
+                )
+        ).toString();
+
 
     private static final Set<String> entityTypes =
             new HashSet<String>(Arrays.asList("account", "device", "ip_address", "password", "user"));
