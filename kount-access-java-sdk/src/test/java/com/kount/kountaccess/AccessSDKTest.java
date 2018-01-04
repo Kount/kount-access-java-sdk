@@ -60,6 +60,7 @@ public class AccessSDKTest {
                 .put("mobile", 1)
                 .put("proxy", 0)
                 .put("region", region)
+                .put("tor", 0)
         ).toString();
 
     String velocityJSON = new JSONObject()
@@ -72,6 +73,7 @@ public class AccessSDKTest {
                 .put("mobile", 1)
                 .put("proxy", 0)
                 .put("region", region)
+                .put("tor", 0)
         )
         .put("velocity", new JSONObject()
                 .put("account", new JSONObject()
@@ -141,6 +143,7 @@ public class AccessSDKTest {
                 .put("mobile", 1)
                 .put("proxy", 0)
                 .put("region", region)
+                .put("tor", 0)
         )
         .put("velocity", new JSONObject()
                 .put("account", new JSONObject()
@@ -279,6 +282,7 @@ public class AccessSDKTest {
             assertEquals(ipGeo, device.get("ipGeo"));
             assertEquals(1, device.get("mobile"));
             assertEquals(0, device.get("proxy"));
+            assertEquals(0, device.get("tor"));
             // validate id
             assertEquals(responseId, accessInfo.getString("response_id"));
             JSONObject velocities = accessInfo.getJSONObject("velocity");
@@ -421,6 +425,7 @@ public class AccessSDKTest {
             assertEquals(ipGeo, device.get("ipGeo"));
             assertEquals(1, device.get("mobile"));
             assertEquals(0, device.get("proxy"));
+            assertEquals(0, device.get("tor"));
             assertEquals(responseId, deviceInfo.get("response_id"));
 
         } catch (IOException ioe) {

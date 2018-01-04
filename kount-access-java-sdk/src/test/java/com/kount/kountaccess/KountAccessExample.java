@@ -118,10 +118,13 @@ public class KountAccessExample {
         // IP Address & Geo information
         System.out.println("Got IP Address:" + device.get("ipAddress"));
         System.out.println("Got IP Geo(Country):" + device.get("ipGeo"));
-        System.out.println("is Proxy:" + (device.get("isProxy")));
+        System.out.println("is Proxy:" + (device.get("proxy")));
 
         // whether we detected the use of a mobile device.
-        System.out.println("isMobile:" + (device.get("isMobile")));
+        System.out.println("isMobile:" + (device.get("mobile")));
+
+        // whether we detected the use of tor
+        System.out.println("isTor:" + (device.get("tor")));
     }
 
     /**
