@@ -1,5 +1,15 @@
 kount-access-java-sdk 2.1.2
 ===========================
+**01/15/2018**
+
+### New features
+* mvn package will generate a jar with dependencies and the README now
+
+### Improvements
+* Clean up of pom.xml files
+
+### Bugfixes
+
 **12/28/2017**
 
 ### New features

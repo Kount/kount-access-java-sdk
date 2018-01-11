@@ -237,6 +237,8 @@ public class AccessSdk {
      *
      * @param session
      *            The Session ID generated for the Data Collector service.
+     * @param additionalParameters
+     *            Additional parameters to send to server.
      * @return The JSONObject with data about the device.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
@@ -412,7 +414,7 @@ public class AccessSdk {
      * @param uniq
      *            Required for trusted state requests.
      *            Merchant assigned account number for the consumer.
-     * @param additionParameters
+     * @param additionalParameters
      *            Additional parameters to send to server.
      * @return Http response code.
      * @throws AccessException
