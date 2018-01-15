@@ -268,7 +268,6 @@ public class AccessSDKTest {
             doReturn(mockResponse).when(mockHttpClient).execute((HttpPost) anyObject());
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
             doReturn(mockHttpClient).when(sdk).getHttpClient();
-            //doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
             doReturn(velocityJSON).when(sdk).getResponseAsString(mockResponse);
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();

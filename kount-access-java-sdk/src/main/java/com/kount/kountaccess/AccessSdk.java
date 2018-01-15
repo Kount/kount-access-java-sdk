@@ -634,7 +634,6 @@ public class AccessSdk {
             }
             return new String(hexChars);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            // ignoring
             logger.warn("Could not hash parameter value", e);
         }
 
@@ -655,7 +654,6 @@ public class AccessSdk {
             if (status.getStatusCode() != 200) {
                 throw new AccessException(AccessErrorType.NETWORK_ERROR,
                         "Bad Response(" + status.getStatusCode() + ")" + status.getReasonPhrase() + " " + urlString);
-
             }
             return this.getResponseAsString(response);
         } catch (UnknownHostException uhe) {
