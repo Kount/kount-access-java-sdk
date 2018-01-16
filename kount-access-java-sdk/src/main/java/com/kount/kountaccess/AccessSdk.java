@@ -501,19 +501,30 @@ public class AccessSdk {
     private void verifyReturnValue(String returnValue) throws AccessException {
         final int bitMin = 1;
         final int bitMax = 15;
-        int rValue = Integer.valueOf(returnValue);
-        if (null == returnValue || rValue > bitMax || rValue < bitMin) {
-            throw new AccessException(AccessErrorType.INVALID_DATA,
+
+
+        if (returnValue != null) {
+            int rValue = Integer.valueOf(returnValue);
+
+            if (rValue > bitMax || rValue < bitMin) {
+                throw new AccessException(AccessErrorType.INVALID_DATA,
                     String.format("Invalid returnValue (%s).  Must be an integer between %d and %d", returnValue, bitMin, bitMax));
+            }
+        } else {
+            throw new AccessException(AccessErrorType.INVALID_DATA,
+                    String.format("ReturnValue may not be null.  Must be an integer between %d and %d", bitMin, bitMax));
         }
     }
 
+    // Bits for each requested data so we can verify we have the right data for each
+    // Using in verifyGatherInfoParameters()
+    private static final int DEVICE_INFO_BITS   = 0b0001;
+    private static final int VELOCITY_BITS      = 0b0010;
+    private static final int THRESHOLD_BITS     = 0b0100;
+    private static final int TRUSTED_STATE_BITS = 0b1000;
+
     // Check we have the right parameters passed for the information requested.
     private void verifyGatherInfoParameters(String session, String returnValue, String deviceId, String uniq) throws AccessException {
-        int deviceInfoBits   = 0b0001;
-        int velocityBits     = 0b0010;
-        int thresholdBits    = 0b0100;
-        int trustedStateBits = 0b1000;
         int returnBits   = Integer.parseInt(returnValue);
 
         // Everything needs these, check we have them
@@ -521,16 +532,16 @@ public class AccessSdk {
         verifyReturnValue(returnValue);
         verifyDeviceId(deviceId);
 
-        if ((deviceInfoBits & returnBits) == deviceInfoBits) {
+        if ((DEVICE_INFO_BITS & returnBits) == DEVICE_INFO_BITS) {
             logger.debug("gatherDeviceInfo requested deviceInfo");
         }
-        if ((velocityBits & returnBits) == velocityBits) {
+        if ((VELOCITY_BITS & returnBits) == VELOCITY_BITS) {
             logger.debug("gatherDeviceInfo requested velocity");
         }
-        if ((thresholdBits & returnBits) == thresholdBits) {
+        if ((THRESHOLD_BITS & returnBits) == THRESHOLD_BITS) {
             logger.debug("gatherDeviceInfo requested threshold");
         }
-        if ((trustedStateBits & returnBits) == trustedStateBits) {
+        if ((TRUSTED_STATE_BITS & returnBits) == TRUSTED_STATE_BITS) {
             logger.debug("gatherDeviceInfo requested trustedState");
             verifyUniq(uniq);
         }
@@ -543,16 +554,17 @@ public class AccessSdk {
         }
     }
 
+    private static final List<String> VALID_TDI = Arrays.asList("trusted", "banned", "not_trusted");
+
     private void verifyTrustState(String trustState) throws AccessException {
-        final String validTDI[] = {"trusted", "banned", "not_trusted" };
-        if (null == trustState || !(Arrays.asList(validTDI).contains(trustState.toLowerCase()))) {
+        if (null == trustState || !(VALID_TDI.contains(trustState.toLowerCase()))) {
             throw new AccessException(AccessErrorType.INVALID_DATA,
-                    "Invalid device trust state (" + trustState +"). Must be one of " + Arrays.toString(validTDI));
+                    "Invalid device trust state (" + trustState +"). Must be one of " + VALID_TDI.toString());
         }
     }
 
     private void verifyUniq(String uniq) throws AccessException {
-        if (uniq.length() > 32) {
+        if (null == uniq || uniq.length() > 32) {
             throw new AccessException(AccessErrorType.INVALID_DATA,
                     "Invalid uniq value (" + uniq + ").  Must not exceed 32 characters in length");
         }
@@ -620,32 +632,15 @@ public class AccessSdk {
         if (null == value || value.isEmpty()) {
             return null;
         }
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-            md.update(value.getBytes("UTF8"), 0, value.length());
-            byte[] hash = md.digest();
-            char[] hexChars = new char[hash.length * 2];
-            int v;
-            for (int j = 0; j < hash.length; j++) {
-                v = hash[j] & 0xFF;
-                hexChars[j * 2] = hexArray[v >>> 4];
-                hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-            }
-            return new String(hexChars);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.warn("Could not hash parameter value", e);
-        }
 
-        return null;
+        return org.apache.commons.codec.digest.DigestUtils.sha256Hex(value);
     }
 
     /**
      * Handles the get request for the device info
      */
     private String getRequest(String urlString) throws AccessException {
-        try {
-            CloseableHttpClient client = getHttpClient();
+        try (CloseableHttpClient client = getHttpClient()){
             HttpGet request = this.getHttpGet(urlString);
             request.addHeader("Authorization", this.getAuthorizationHeader());
             request.addHeader("Content-Type", "JSON");
@@ -677,8 +672,7 @@ public class AccessSdk {
      *             Thrown if the URL is bad or we can't connect or parse the response.
      */
     private String postRequest(String urlString, List<NameValuePair> values) throws AccessException {
-        try {
-            CloseableHttpClient client = getHttpClient();
+        try (CloseableHttpClient client = getHttpClient()){
             HttpPost request = getHttpPost(urlString);
             request.addHeader("Authorization", this.getAuthorizationHeader());
             HttpEntity entity = new UrlEncodedFormEntity(values);
@@ -689,7 +683,6 @@ public class AccessSdk {
             if (status.getStatusCode() != 200) {
                 throw new AccessException(AccessErrorType.NETWORK_ERROR,
                         "Bad Response(" + status.getStatusCode() + ")" + status.getReasonPhrase() + " " + urlString);
-
             }
             return getResponseAsString(response);
         } catch (UnknownHostException uhe) {
