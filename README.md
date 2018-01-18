@@ -33,7 +33,6 @@ Ensure you have the information needed to instantiate the library in your app.
 Kount Access API Versions:
 
 * 0200
-* 0210
-* 0320 (default)
+* 0210 (default)
 
 For more information on using this library, consult the wiki section.
