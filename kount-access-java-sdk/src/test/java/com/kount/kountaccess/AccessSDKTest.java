@@ -487,7 +487,7 @@ public class AccessSDKTest {
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();
 
-            JSONObject response = sdk.setDeviceTrust(user, password, fingerprint, uniq, "trusted");
+            JSONObject response = sdk.setDeviceTrust(fingerprint, uniq, "trusted");
             logger.debug(response);
             assertTrue(response == null);
         } catch (IOException ioe) {
@@ -510,7 +510,7 @@ public class AccessSDKTest {
             HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
-            sdk.setDeviceTrust(user, password, fingerprint, uniq, "whatever is bad");
+            sdk.setDeviceTrust(fingerprint, uniq, "whatever is bad");
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -530,7 +530,7 @@ public class AccessSDKTest {
             HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
-            sdk.setDeviceTrust(user, password, fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz", "trusted");
+            sdk.setDeviceTrust(fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz", "trusted");
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -550,7 +550,7 @@ public class AccessSDKTest {
             HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
-            sdk.setDeviceTrust(user, password, "0123456789abcdefghijklmnopqrstuvwxyz", uniq, "trusted");
+            sdk.setDeviceTrust("0123456789abcdefghijklmnopqrstuvwxyz", uniq, "trusted");
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());

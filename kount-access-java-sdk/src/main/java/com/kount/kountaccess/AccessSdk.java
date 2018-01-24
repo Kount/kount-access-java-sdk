@@ -439,10 +439,6 @@ public class AccessSdk {
     /**
      * Creates or updates the trust state for device using the TDI service.
      *
-     * @param username
-     *            The username of the user.
-     * @param password
-     *            The password of the user.
      * @param deviceId
      *            The unique deviceId.
      * @param uniq
@@ -454,18 +450,14 @@ public class AccessSdk {
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState) throws AccessException {
-        return setDeviceTrust(username, password, deviceId, uniq, trustState, null);
+    public JSONObject setDeviceTrust(String deviceId, String uniq, String trustState) throws AccessException {
+        return setDeviceTrust(deviceId, uniq, trustState, null);
     }
 
     /**
      * Creates or updates the trust state for device using the TDI service. Contains argument for passing additional
      * parameters.
      *
-     * @param username
-     *            The username of the user.
-     * @param password
-     *            The password of the user.
      * @param deviceId
      *            The unique deviceId.
      * @param uniq
@@ -479,9 +471,9 @@ public class AccessSdk {
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public JSONObject setDeviceTrust(String username, String password, String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
+    public JSONObject setDeviceTrust(String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
 
-        List<NameValuePair> parameters = createRequestParameters(null, username, password, additionalParameters);
+        List<NameValuePair> parameters = createRequestParameters(null, null, null, additionalParameters);
         verifyTrustState(trustState);
         verifyUniq(uniq);
         verifyDeviceId(deviceId);
