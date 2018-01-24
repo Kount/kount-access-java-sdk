@@ -45,7 +45,7 @@ Get velocity for one of our customers:
     "The number of unique user access request(s) this hour for this device is:" + numUsersForDevice);
 ```
 
-And last, the `decision` endpoint usage:
+The `decision` endpoint usage:
 
 ```java
   JSONObject decisionInfo = sdk.getDecision(sessionId, username, password); // those again are hashed internally
@@ -56,3 +56,28 @@ And last, the `decision` endpoint usage:
   System.out.println("decision: " + decision.getJSONObject("reply").getJSONObject("ruleEvents").get("decision"));
 ```
 
+Setting the trusted state:
+
+```java
+  // The uniq is a merchant assigned identifier like an account number
+  String uniq = "uniqIdentifierMerchantMakes";
+
+  // Trusted states are "trusted", "banned", "not_trusted"
+  String trustState = "trusted";
+
+  // No response is passed back from the method. An AccessException will be thrown if it failed
+  sdk.setDeviceTrust(deviceID, uniq, trustState);
+```
+
+Gather device info returns all desired device information:
+
+```java
+  // returnValue is a bitmap and expects to be a parameter from 1-15 depending on what information
+  // is requested
+  String returnValue = "15";
+
+  JSONObject deviceInformation = sdk.gatherDeviceInfo(session, username, password, returnValue, uniq);
+
+  // Let's see the response
+  System.out.println("Response: " + deviceInformation);
+```
