@@ -356,19 +356,16 @@ public class AccessSdk {
      *            |     15      |     Y      |    Y     |     Y     |       Y       |
      *            ------------------------------------------------------------------
      *
-     * @param deviceId
-     *            Required for all requests.
-     *            The unique deviceId.
      * @param uniq
      *            Required for trusted state requests.
      *            Merchant assigned account number for the consumer.
-     * @return Http response code.
+     * @return A JSON object containing the response.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
     public JSONObject gatherDeviceInfo(String session, String username, String password,
-                                       String returnValue, String deviceId, String uniq) throws AccessException {
-        return gatherDeviceInfo(session, username, password, returnValue, deviceId, uniq, null);
+                                       String returnValue, String uniq) throws AccessException {
+        return gatherDeviceInfo(session, username, password, returnValue, uniq, null);
     }
 
     /**
@@ -408,23 +405,23 @@ public class AccessSdk {
      *            |     15      |     Y      |    Y     |     Y     |       Y       |
      *            ------------------------------------------------------------------
      *
-     * @param deviceId
-     *            Required for all requests.
-     *            The unique deviceId.
      * @param uniq
      *            Required for trusted state requests.
      *            Merchant assigned account number for the consumer.
      * @param additionalParameters
      *            Additional parameters to send to server.
-     * @return Http response code.
+     * @return A JSON Object containing the response.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
     public JSONObject gatherDeviceInfo(String session, String username, String password,
-            String returnValue, String deviceId, String uniq, Map<String, String> additionalParameters) throws AccessException {
+            String returnValue, String uniq, Map<String, String> additionalParameters) throws AccessException {
 
         List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
-        verifyGatherInfoParameters(session, returnValue, deviceId, uniq);
+        verifyGatherInfoParameters(session, returnValue, uniq);
+
+        parameters.add(new BasicNameValuePair("uniq", uniq));
+        parameters.add(new BasicNameValuePair("i", returnValue));
 
         logger.debug("gather device info request: host = " + deviceInfoEndpoint + ", parameters = " + parameters.toString());
         String response = this.postRequest(deviceInfoEndpoint, parameters);
@@ -446,12 +443,11 @@ public class AccessSdk {
      * @param trustState
      *            The state to set the device to.
      *            Accepted values are: "trusted", "banned", or "not_trusted".
-     * @return Http response code.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public JSONObject setDeviceTrust(String deviceId, String uniq, String trustState) throws AccessException {
-        return setDeviceTrust(deviceId, uniq, trustState, null);
+    public void setDeviceTrust(String deviceId, String uniq, String trustState) throws AccessException {
+        setDeviceTrust(deviceId, uniq, trustState, null);
     }
 
     /**
@@ -467,27 +463,22 @@ public class AccessSdk {
      *            Accepted values are: "trusted", "banned", or "not_trusted".
      * @param additionalParameters
      *            Additional parameters to send to server.
-     * @return Http response code.
      * @throws AccessException
      *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
      */
-    public JSONObject setDeviceTrust(String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
+    public void setDeviceTrust(String deviceId, String uniq, String trustState, Map<String, String> additionalParameters) throws AccessException {
 
         List<NameValuePair> parameters = createRequestParameters(null, null, null, additionalParameters);
         verifyTrustState(trustState);
         verifyUniq(uniq);
         verifyDeviceId(deviceId);
 
+        parameters.add(new BasicNameValuePair("d", deviceId));
+        parameters.add(new BasicNameValuePair("uniq", uniq));
         parameters.add(new BasicNameValuePair("ts", trustState));
 
         logger.debug("device trust request: host = " + deviceTrustEndpoint + ", parameters = " + parameters.toString());
         String response = this.postRequest(deviceTrustEndpoint, parameters);
-
-        if (response != null) {
-            return processJSONEntity(response);
-        }
-
-        return null;
     }
 
     private void verifyReturnValue(String returnValue) throws AccessException {
@@ -516,13 +507,12 @@ public class AccessSdk {
     private static final int TRUSTED_STATE_BITS = 0b1000;
 
     // Check we have the right parameters passed for the information requested.
-    private void verifyGatherInfoParameters(String session, String returnValue, String deviceId, String uniq) throws AccessException {
+    private void verifyGatherInfoParameters(String session, String returnValue, String uniq) throws AccessException {
         int returnBits   = Integer.parseInt(returnValue);
 
         // Everything needs these, check we have them
         verifySessionId(session);
         verifyReturnValue(returnValue);
-        verifyDeviceId(deviceId);
 
         if ((DEVICE_INFO_BITS & returnBits) == DEVICE_INFO_BITS) {
             logger.debug("gatherDeviceInfo requested deviceInfo");

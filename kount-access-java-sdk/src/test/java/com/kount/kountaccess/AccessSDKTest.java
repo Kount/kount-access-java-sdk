@@ -477,7 +477,6 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
             CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
             StatusLine mockStatus = mock(StatusLine.class);
 
@@ -487,9 +486,7 @@ public class AccessSDKTest {
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();
 
-            JSONObject response = sdk.setDeviceTrust(fingerprint, uniq, "trusted");
-            logger.debug(response);
-            assertTrue(response == null);
+            sdk.setDeviceTrust(fingerprint, uniq, "trusted");
         } catch (IOException ioe) {
             fail("Exception:" + ioe.getMessage());
         } catch (AccessException ae) {
@@ -507,7 +504,6 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
             sdk.setDeviceTrust(fingerprint, uniq, "whatever is bad");
@@ -527,7 +523,6 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
             sdk.setDeviceTrust(fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz", "trusted");
@@ -547,7 +542,6 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
             sdk.setDeviceTrust("0123456789abcdefghijklmnopqrstuvwxyz", uniq, "trusted");
@@ -558,7 +552,7 @@ public class AccessSDKTest {
     }
 
     /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String)}.
      */
     @Test
     public void testGatherDeviceInfoHappyPath() {
@@ -567,7 +561,6 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
             CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
             StatusLine mockStatus = mock(StatusLine.class);
 
@@ -577,7 +570,7 @@ public class AccessSDKTest {
             doReturn(mockStatus).when(mockResponse).getStatusLine();
             doReturn(200).when(mockStatus).getStatusCode();
 
-            JSONObject deviceInfo = sdk.gatherDeviceInfo(session, user, password, "15", fingerprint, uniq);
+            JSONObject deviceInfo = sdk.gatherDeviceInfo(session, user, password, "15", uniq);
             logger.debug(deviceInfo);
 
             JSONObject device = deviceInfo.getJSONObject("device");
@@ -597,7 +590,7 @@ public class AccessSDKTest {
     }
 
     /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String)}.
      */
     @Test
     public void testBadReturnValueLessThanGatherDeviceInfo() {
@@ -606,11 +599,10 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo(session, user, password, "-1", fingerprint, uniq);
+            sdk.gatherDeviceInfo(session, user, password, "-1", uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -618,7 +610,7 @@ public class AccessSDKTest {
     }
 
     /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String)}.
      */
     @Test
     public void testBadReturnValueGreaterThanGatherDeviceInfo() {
@@ -627,11 +619,10 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo(session, user, password, "16", fingerprint, uniq);
+            sdk.gatherDeviceInfo(session, user, password, "16", uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -639,7 +630,7 @@ public class AccessSDKTest {
     }
 
     /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String)}.
      */
     @Test
     public void testBadSessionGatherDeviceInfo() {
@@ -648,11 +639,10 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo("badSessionID", user, password, "15", fingerprint, uniq);
+            sdk.gatherDeviceInfo("badSessionID", user, password, "15", uniq);
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -660,7 +650,7 @@ public class AccessSDKTest {
     }
 
     /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
+     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String)}.
      */
     @Test
     public void testBadUniqGatherDeviceInfo() {
@@ -669,32 +659,10 @@ public class AccessSDKTest {
             AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 
             CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
 
             doReturn(mockHttpClient).when(sdk).getHttpClient();
 
-            sdk.gatherDeviceInfo(session, user, password, "15", fingerprint, "0123456789abcdefghijklmnopqrstuvwxyz");
-            fail("AccessException not thrown");
-        } catch (AccessException ae) {
-            assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
-        }
-    }
-
-    /**
-     * Test method for {@link com.kount.kountaccess.AccessSdk#gatherDeviceInfo(String, String, String, String, String, String)}.
-     */
-    @Test
-    public void testBadDeviceIdGatherDeviceInfo() {
-
-        try {
-            AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
-
-            CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
-            HttpPost mockPost = mock(HttpPost.class);
-
-            doReturn(mockHttpClient).when(sdk).getHttpClient();
-
-            sdk.gatherDeviceInfo(session, user, password, "15", "0123456789abcdefghijklmnopqrstuvwxyz", uniq);
+            sdk.gatherDeviceInfo(session, user, password, "15", "0123456789abcdefghijklmnopqrstuvwxyz");
             fail("AccessException not thrown");
         } catch (AccessException ae) {
             assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());

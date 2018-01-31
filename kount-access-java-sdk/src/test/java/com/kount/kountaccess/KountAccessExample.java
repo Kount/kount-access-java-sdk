@@ -24,6 +24,12 @@ public class KountAccessExample {
     private String session = "abcdef12345678910abcdef123456789"; // "THIS_IS_THE_USERS_SESSION_FROM_JAVASCRIPT_CLIENT_SDK";
 
     /**
+     * Fake deviceID (this should be retrieved from the Kount Access Data Collector Client SDK). This will be a value
+     * up to 32 characters.
+     */
+    private String deviceID = "abcdef12345678910abcdef123456789";
+
+    /**
      * Merchant's customer ID at Kount. This should be the id you were issued from Kount.
      */
     private int merchantId = 0;
@@ -98,6 +104,32 @@ public class KountAccessExample {
             // Let's look at the data
             printDecisionInfo(decision);
 
+            // If you want to set the trusted state of a device, pass setDeviceTrust
+            // the device ID which is the devices unique identifier, the uniq which is
+            // a merchant assigned identifier like an account number for the consumer,
+            // and the trusted state; trusted states can be "trusted",
+            // "banned", or "not_trusted".
+            //
+            // Setting the trust state of the device does not return a response
+            // if successful, just a 200 response code. If there is an error it will
+            // be returned.
+            String uniq = "uniqIdentifierMerchantMakes";
+            String trustState = "trusted";
+            sdk.setDeviceTrust(deviceID, uniq, trustState);
+
+
+            // Gathering device information endpoint is like the kitchen sink method;
+            // it can get you all the desired device information in one call based on the
+            // requested return value. To call it provide the session and uniq
+            // identifier of the device.
+            // returnValue is a bitmap and expects a parameter from 1-15 depending on
+            // what information you want; deviceInfo, velocity, threshold, trusted state.
+            String returnValue = "15";
+            JSONObject deviceInformation = sdk.gatherDeviceInfo(session, username, password, returnValue, uniq);
+
+            // Let's see the response
+            System.out.println("Response: " + deviceInformation);
+
         } catch (AccessException ae) {
             // These can be thrown if there were any issues making the request.
             // See the AccessException class for more information.
@@ -137,7 +169,7 @@ public class KountAccessExample {
         System.out.println("Velocity Info for " + entityType);
         for (String vType : velocityTypes) {
             if (entity.has(vType)) {
-                System.out.println("     " + vType + ": " + entity.getString(vType));
+                System.out.println("     " + vType + ": " + entity.get(vType));
             }
         }
     }
