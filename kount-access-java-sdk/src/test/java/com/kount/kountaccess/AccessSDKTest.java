@@ -4,16 +4,24 @@
 package com.kount.kountaccess;
 
 //import static org.junit.Assert.*;
-import static junit.framework.Assert.*;
-import static org.mockito.Mockito.*;
-
-import com.kount.kountaccess.AccessException.AccessErrorType;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import net.sf.json.JSONObject;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,16 +31,20 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import com.kount.kountaccess.AccessException.AccessErrorType;
+
+import net.sf.json.JSONObject;
+
 /**
  * Unit Tests around the Access SDK
- * 
+ *
  * @author gjd, abe
  *
  */
 public class AccessSDKTest {
 
 	private static final Logger logger = Logger.getLogger(AccessSDKTest.class);
-	
+
 	// Setup data for comparisons.
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";
@@ -47,6 +59,7 @@ public class AccessSDKTest {
 	String ipGeo = "US";
 	String responseId = "bf10cd20cf61286669e87342d029e405";
 	String decision = "A";
+	String uniq = "customer identifier";
 
 	String velocityJSON = "{" + "    \"device\": {" + "        \"id\": \"" + fingerprint + "\", "
 			+ "        \"ipAddress\": \"" + ipAddress + "\", " + "        \"ipGeo\": \"" + ipGeo + "\", "
@@ -96,8 +109,8 @@ public class AccessSDKTest {
 			+ "            \"iplh\": 1, " + "            \"iplm\": 1, " + "            \"plh\": 1, "
 			+ "            \"plm\": 1" + "        }" + "    }" + "}";
 
-	private static final Set<String> entityTypes = 
-			new HashSet<String>(Arrays.asList("account", "device", "ip_address", "password", "user"));
+	private static final Set<String> entityTypes =
+			new HashSet<>(Arrays.asList("account", "device", "ip_address", "password", "user"));
 
 	/**
 	 * Test method for {@link com.kount.kountaccess.AccessSdk#AccessSdk(java.lang.String, int, java.lang.String)}.
@@ -202,7 +215,7 @@ public class AccessSDKTest {
 			JSONObject velocities = accessInfo.getJSONObject("velocity");
 			Iterator<String> iter = entityTypes.iterator();
 			while (iter.hasNext()) {
-				String entityType = (String) iter.next();
+				String entityType = iter.next();
 				JSONObject velocityInfo = velocities.getJSONObject(entityType);
 				assertNotNull("Velocity Type was null " + entityType, velocityInfo);
 				assertEquals(8, velocityInfo.keySet().size());
@@ -313,7 +326,7 @@ public class AccessSDKTest {
 	 * Test method for {@link com.kount.kountaccess.AccessSdk#getDevice(java.lang.String)}.
 	 */
 	@Test
-	public void testGetDevice() {
+	public void testGetDeviceHappyPath() {
 		try {
 			// class to test
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
@@ -378,6 +391,164 @@ public class AccessSDKTest {
 			fail("Exception:" + ioe.getMessage());
 		} catch (AccessException ae) {
 			fail("Exception:" + ae.getMessage());
+		}
+	}
+
+	/**
+	 * Test method for {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceHappyPath() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
+			StatusLine mockStatus = mock(StatusLine.class);
+			doReturn(mockResponse).when(mockHttpClient).execute((HttpPost) anyObject());
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			doReturn("").when(sdk).getResponseAsString(mockResponse);
+			doReturn(mockStatus).when(mockResponse).getStatusLine();
+			doReturn(200).when(mockStatus).getStatusCode();
+			sdk.setDeviceTrustByDevice(fingerprint, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+		} catch (IOException ioe) {
+			fail("Exception:" + ioe.getMessage());
+		} catch (AccessException ae) {
+			fail("Exception:" + ae.getMessage());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for missing deviceId(fingerprint) Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceMissingDeviceId() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(null, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for blank deviceId(fingerprint) Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceBlankDeviceId() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice("", uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for missing uniq(customer identifier) Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceMissingUniq() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, null, AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for blank uniq(customer identifier) Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceBlankUniq() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, "", AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for missing trustedState Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceMissingTrustedState() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, uniq, null);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for blank trustedState Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceBlankTrustedState() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, uniq, "");
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException for wrong trustedState Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceWrongTrustedState() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, uniq, "some random text");
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
 		}
 	}
 
