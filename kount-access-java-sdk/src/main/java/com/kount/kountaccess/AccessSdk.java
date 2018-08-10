@@ -137,7 +137,7 @@ public class AccessSdk {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid apiKey(" + apiKey + ")");
 		}
 
-		if ((merchantId < 99999) || (merchantId > 1000000)) {
+		if ((merchantId < 100000) || (merchantId > 999999)) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid merchantId");
 		}
 
