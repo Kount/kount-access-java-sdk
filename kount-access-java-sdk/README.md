@@ -23,6 +23,12 @@ Set the trusted state of a device by its id:
   sdk.setDeviceTrustByDevice(deviceId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
 ```
 
+Set the trusted state of a device by session ID:
+
+```
+  sdk.setDeviceTrustBySession(sessionId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+```
+
 Retrieve device information collected by the Data Collector:
 
 ```java

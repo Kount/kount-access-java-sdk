@@ -103,6 +103,9 @@ public class KountAccessExample {
 			// Setting a trust state of a device by the deviceId/fingerprint
 			sdk.setDeviceTrustByDevice(deviceId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
 
+			// Setting a trust state for device by session
+			sdk.setDeviceTrustBySession(session, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+
 		} catch (AccessException ae) {
 			// These can be thrown if there were any issues making the request.
 			// See the AccessException class for more information.
