@@ -10,7 +10,7 @@ import net.sf.json.JSONObject;
  * This is an example implementation of the Kount Access API SDK. In this example we will show how to create, prepare,
  * and make requests to the Kount Access API, and what to expect as a result. Before you can make API requests, you'll
  * need to have made collector request(s) prior, and you'll have to use the session id(s) that were returned.
- * 
+ *
  * @author custserv@kount.com
  * @version 2.1.0
  * @copyright 2015 Kount, Inc. All Rights Reserved.
@@ -39,30 +39,30 @@ public class KountAccessExample {
 	 */
 	private String host = "api-sandbox01.kountaccess.com";
 
-	private Set<String> entityTypes = 
-			new HashSet<String>(Arrays.asList("account", "device", "ip_address", "password", "user"));
-	private Set<String> velocityTypes = 
-			new HashSet<String>(Arrays.asList("alh", "alm", "dlh", "dlm", "iplh", "iplm", "plh", "plm", "ulh", "ulm"));
+	private Set<String> entityTypes =
+			new HashSet<>(Arrays.asList("account", "device", "ip_address", "password", "user"));
+	private Set<String> velocityTypes =
+			new HashSet<>(Arrays.asList("alh", "alm", "dlh", "dlm", "iplh", "iplm", "plh", "plm", "ulh", "ulm"));
 
 	/**
 	 * Simple Example within the Constructor.
 	 */
 	public KountAccessExample() {
 		try {
-			// Create the SDK. If any of these values are invalid, an com.kount.kountaccess.AccessException will be 
+			// Create the SDK. If any of these values are invalid, an com.kount.kountaccess.AccessException will be
 			// thrown along with a message detailing why.
 			AccessSdk sdk = new AccessSdk(host, merchantId, apiKey);
 
-			// If you want the device information for a particular user's session, just pass in the sessionId. This 
+			// If you want the device information for a particular user's session, just pass in the sessionId. This
 			// contains the id (fingerprint), IP address, IP Geo Location (country), whether the user was using a proxy
 			// (and it was bypassed), and ...
 			JSONObject deviceInfo = sdk.getDevice(this.session);
 
 			this.printDeviceInfo(deviceInfo.getJSONObject("device"));
 
-			// ... if you want to see the velocity information in relation to the users session and their account 
+			// ... if you want to see the velocity information in relation to the users session and their account
 			// information, you can make an access (velocity) request. Usernames and passwords will be hashed prior to
-			// transmission to Kount within the SDK. You may optionally hash prior to passing them in as long as the 
+			// transmission to Kount within the SDK. You may optionally hash prior to passing them in as long as the
 			// hashing method is consistent for the same value.
 			String username = "billyjoe@bobtown.org";
 			String password = "notreally";
@@ -79,7 +79,7 @@ public class KountAccessExample {
 
 			// Velocity Information is stored in a JSONObject, by entity type
 			JSONObject velocity = accessInfo.getJSONObject("velocity");
-			
+
 			// Let's look at the data
 			for (String type : entityTypes) {
 				this.printVelocityInfo(type, velocity.getJSONObject(type));
@@ -98,6 +98,11 @@ public class KountAccessExample {
 			// Let's look at the data
 			printDecisionInfo(decision);
 
+			String deviceId = "device id(fingerprint)";
+			String uniq = "uniq(customer identifier)";
+			// Setting a trust state of a device by the deviceId/fingerprint
+			sdk.setDeviceTrustByDevice(deviceId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+
 		} catch (AccessException ae) {
 			// These can be thrown if there were any issues making the request.
 			// See the AccessException class for more information.
@@ -108,25 +113,25 @@ public class KountAccessExample {
 
 	/**
 	 * Example method to walk through the device JSONObject data.
-	 * 
+	 *
 	 * @param device
 	 */
 	public void printDeviceInfo(JSONObject device) {
 		// Fingerprint
 		System.out.println("Got Fingerprint:" + device.get("id"));
-		
+
 		// IP Address & Geo information
 		System.out.println("Got IP Address:" + device.get("ipAddress"));
 		System.out.println("Got IP Geo(Country):" + device.get("ipGeo"));
 		System.out.println("is Proxy:" + (device.get("isProxy")));
-		
+
 		// whether we detected the use of a mobile device.
 		System.out.println("isMobile:" + (device.get("isMobile")));
 	}
 
 	/**
 	 * Example method to walk through the velocity JSONObject data.
-	 * 
+	 *
 	 * @param entityType
 	 * @param entity
 	 */
@@ -149,7 +154,7 @@ public class KountAccessExample {
 
 	/**
 	 * Test main. Just runs the constructor.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String args[]) {

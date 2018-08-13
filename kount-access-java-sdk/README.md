@@ -14,6 +14,15 @@ Create an SDK object:
   AccessSdk sdk = new AccessSdk(accessHost, merchantId, apiKey);
 ```
 
+Set the trusted state of a device by its id:
+
+```java
+  String deviceId = "device id(fingerprint)";
+  String uniq = "uniq(customer identifier)";
+  // Setting a trust state of a device by the deviceId/fingerprint
+  sdk.setDeviceTrustByDevice(deviceId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+```
+
 Retrieve device information collected by the Data Collector:
 
 ```java
