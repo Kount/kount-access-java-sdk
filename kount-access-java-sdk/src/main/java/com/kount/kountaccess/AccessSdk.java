@@ -113,7 +113,13 @@ public class AccessSdk {
 	private final String deviceTrustByDeviceEndpoint;
 
 	/**
-	 * Creates an instance of the AccessSdk associated with a specific host and merchant.
+	 * devicetrustbysession endpoint
+	 */
+	private final String deviceTrustBySessionEndpoint;
+
+	/**
+	 * Creates an instance of the AccessSdk associated with a specific host and
+	 * merchant.
 	 *
 	 * @param host
 	 *            FQDN of the host that AccessSdk will communicate with.
@@ -122,7 +128,8 @@ public class AccessSdk {
 	 * @param apiKey
 	 *            The API Key for the merchant.
 	 * @throws AccessException
-	 *             Thrown if any of the values are invalid. ({@link AccessErrorType#INVALID_DATA}).
+	 *             Thrown if any of the values are invalid.
+	 *             ({@link AccessErrorType#INVALID_DATA}).
 	 */
 	public AccessSdk(String host, int merchantId, String apiKey) throws AccessException {
 		if ((host == null) || host.isEmpty()) {
@@ -146,6 +153,7 @@ public class AccessSdk {
 		this.deviceEndpoint = "https://" + host + "/api/device";
 		this.decisionEndpoint = "https://" + host + "/api/decision";
 		this.deviceTrustByDeviceEndpoint = "https://" + host + "/api/devicetrustbydevice";
+		this.deviceTrustBySessionEndpoint = "https://" + host + "/api/devicetrustbysession";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -156,6 +164,7 @@ public class AccessSdk {
 		logger.debug("decision endpoint: " + decisionEndpoint);
 		logger.debug("device endpoint: " + deviceEndpoint);
 		logger.debug("devicetrustbydevice endpoint: " + deviceTrustByDeviceEndpoint);
+		logger.debug("devicetrustbysession endpoint: " + deviceTrustBySessionEndpoint);
 	}
 
 	/**
@@ -278,36 +287,41 @@ public class AccessSdk {
 	}
 
 	/**
-	 * devicetrustbydevice Endpoint. Sets the device trusted state.
+	 * devicetrustbydevice Endpoint. Sets the device trusted state by device id.
 	 *
 	 * @param deviceId
 	 *            Device ID(fingerprint).
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and banned)
+	 *            trusted state (possible values: trusted, not_trusted and
+	 *            banned)
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState) throws AccessException {
 		setDeviceTrustByDevice(deviceId, uniq, trustedState, null);
 	}
 
 	/**
-	 * devicetrustbydevice Endpoint. Sets the device trusted state. Contains argument for passing additional parameters.
+	 * devicetrustbydevice Endpoint. Sets the device trusted state by device id.
+	 * Contains argument for passing additional parameters.
 	 *
 	 * @param deviceId
 	 *            Device ID(fingerprint).
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and banned)
+	 *            trusted state (possible values: trusted, not_trusted and
+	 *            banned)
 	 * @param additionalParameters
 	 *            Additional parameters to send to server.
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
@@ -317,14 +331,7 @@ public class AccessSdk {
 		if ((uniq == null) || uniq.isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
 		}
-		if ((trustedState == null) || trustedState.isEmpty()) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing trustedState.");
-		}
-		if (!(TRUSTED_STATE_TRUSTED.equals(trustedState) || TRUSTED_STATE_NOT_TRUSTED.equals(trustedState)
-				|| TRUSTED_STATE_BANNED.equals(trustedState))) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid trustedState (" + trustedState
-					+ "). Must be one of the following values: " + TRUSTED_STATE_TRUSTED + ".");
-		}
+		verifyTrustedState(trustedState);
 
 		if (additionalParameters == null) {
 			additionalParameters = new HashMap<>();
@@ -337,6 +344,63 @@ public class AccessSdk {
 		logger.debug("devicetrustbydevice request: host = " + deviceTrustByDeviceEndpoint + ", parameters = "
 				+ parameters.toString());
 		this.postRequest(deviceTrustByDeviceEndpoint, parameters);
+	}
+
+	/**
+	 * devicetrustbysession Endpoint. Sets device trusted state by session.
+	 *
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer IDs
+	 * @param trustedState
+	 *            trusted state (possible values: trusted, not_trusted and
+	 *            banned)
+	 * @return The JSONObject with data about the device.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public void setDeviceTrustBySession(String session, String uniq, String trustedState) throws AccessException {
+		setDeviceTrustBySession(session, uniq, trustedState, null);
+	}
+
+	/**
+	 * devicetrustbysession Endpoint. Sets device trusted state by session.
+	 * Contains argument for passing additional parameters.
+	 *
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer IDs
+	 * @param trustedState
+	 *            trusted state (possible values: trusted, not_trusted and
+	 *            banned)
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return The JSONObject with data about the device.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public void setDeviceTrustBySession(String session, String uniq, String trustedState,
+			Map<String, String> additionalParameters) throws AccessException {
+		verifySessionId(session);
+		if ((uniq == null) || uniq.isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
+		}
+		verifyTrustedState(trustedState);
+
+		if (additionalParameters == null) {
+			additionalParameters = new HashMap<>();
+		}
+		additionalParameters.put("uniq", uniq);
+		additionalParameters.put("ts", trustedState);
+
+		List<NameValuePair> parameters = createRequestParameters(session, null, null, additionalParameters);
+		logger.debug("devicetrustbysession request: host = " + deviceTrustBySessionEndpoint + ", parameters = "
+				+ parameters.toString());
+		this.postRequest(deviceTrustBySessionEndpoint, parameters);
 	}
 
 	/**
@@ -391,6 +455,17 @@ public class AccessSdk {
 		if ((session == null) || (session.length() != 32)) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Invalid sessionid (" + session + ").  Must be 32 characters in length");
+		}
+	}
+
+	private void verifyTrustedState(String trustedState) throws AccessException {
+		if ((trustedState == null) || trustedState.isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing trustedState.");
+		}
+		if (!(TRUSTED_STATE_TRUSTED.equals(trustedState) || TRUSTED_STATE_NOT_TRUSTED.equals(trustedState)
+				|| TRUSTED_STATE_BANNED.equals(trustedState))) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid trustedState (" + trustedState
+					+ "). Must be one of the following values: " + TRUSTED_STATE_TRUSTED + ".");
 		}
 	}
 
@@ -623,7 +698,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getDeviceInfo(String session) throws AccessException {
 		return getDevice(session);
 	}
@@ -643,7 +717,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password) throws AccessException {
 		return getVelocity(session, username, password, null);
 	}
@@ -666,7 +739,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password,
 			Map<String, String> additionalParams) throws AccessException {
 		return getVelocity(session, username, password, additionalParams);
