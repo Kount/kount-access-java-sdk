@@ -1,4 +1,5 @@
 # Kount Access API SDK
+[![Build Status](https://travis-ci.org/Kount/kount-access-java-sdk.svg?branch=master)](https://travis-ci.org/Kount/kount-access-java-sdk)
 
 ## Overview
 

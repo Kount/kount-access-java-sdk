@@ -118,6 +118,11 @@ public class AccessSdk {
 	private final String deviceTrustBySessionEndpoint;
 
 	/**
+	 * Authorization header
+	 */
+	private String authorizationHeader;
+
+	/**
 	 * Creates an instance of the AccessSdk associated with a specific host and
 	 * merchant.
 	 *
@@ -159,7 +164,8 @@ public class AccessSdk {
 		this.apiKey = apiKey;
 		this.version = DEFAULT_API_VERSION;
 
-		logger.info("Access SDK using merchantId = " + this.merchantId + ", host = " + host);
+		logger.info("Access SDK using merchantId = " + this.merchantId + ", host = " + host + ", version = " + version
+				+ " and API key starting with " + apiKey.substring(0, 4));
 		logger.debug("velocity endpoint: " + velocityEndpoint);
 		logger.debug("decision endpoint: " + decisionEndpoint);
 		logger.debug("device endpoint: " + deviceEndpoint);
@@ -227,7 +233,9 @@ public class AccessSdk {
 		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
 
 		logger.debug("velocity request: host = " + velocityEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
 		String response = this.postRequest(velocityEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
 		if (response != null) {
 			return processJSONEntity(response);
 		}
@@ -278,7 +286,9 @@ public class AccessSdk {
 
 		logger.debug("device info request: url = " + urlString);
 
+		long startTime = System.currentTimeMillis();
 		String response = this.getRequest(urlString);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
 		if (response != null) {
 			return processJSONEntity(response);
 		}
@@ -343,7 +353,9 @@ public class AccessSdk {
 		List<NameValuePair> parameters = createRequestParameters(null, null, null, additionalParameters);
 		logger.debug("devicetrustbydevice request: host = " + deviceTrustByDeviceEndpoint + ", parameters = "
 				+ parameters.toString());
+		long startTime = System.currentTimeMillis();
 		this.postRequest(deviceTrustByDeviceEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime));
 	}
 
 	/**
@@ -400,7 +412,9 @@ public class AccessSdk {
 		List<NameValuePair> parameters = createRequestParameters(session, null, null, additionalParameters);
 		logger.debug("devicetrustbysession request: host = " + deviceTrustBySessionEndpoint + ", parameters = "
 				+ parameters.toString());
+		long startTime = System.currentTimeMillis();
 		this.postRequest(deviceTrustBySessionEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime));
 	}
 
 	/**
@@ -443,7 +457,9 @@ public class AccessSdk {
 
 		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
 		logger.debug("decision request: host = " + decisionEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
 		String response = this.postRequest(decisionEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
 		if (response != null) {
 			return processJSONEntity(response);
 		}
@@ -501,10 +517,13 @@ public class AccessSdk {
 	 * Creates the authentication header.
 	 */
 	private String getAuthorizationHeader() {
+		if (authorizationHeader != null) {
+			return authorizationHeader;
+		}
 		String header = merchantId + ":" + apiKey;
 		try {
-			String encoded = "Basic " + DatatypeConverter.printBase64Binary(header.getBytes("UTF8"));
-			return encoded;
+			authorizationHeader = "Basic " + DatatypeConverter.printBase64Binary(header.getBytes("UTF8"));
+			return authorizationHeader;
 		} catch (UnsupportedEncodingException e) {
 			logger.warn("Could not create authorization header", e);
 		}
