@@ -1,4 +1,5 @@
 language: java
-jdk: 
- - oraclejdk7
- - openjdk7
+jdk: openjdk7
+script: 
+  - export MAVEN_OPTS="-Xmx256m -Xmx1024m"
+  - mvn clean install
