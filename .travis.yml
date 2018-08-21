@@ -1,5 +1,5 @@
 language: java
 jdk: openjdk7
 script: 
-  - export MAVEN_OPTS="-Xmx256m -Xmx1024m"
+  - export _JAVA_OPTIONS="-Xmx512m -Xms256m"
   - mvn clean install
