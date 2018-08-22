@@ -58,6 +58,21 @@ Retrieve devices information related to a customer (uniq):
   }
 ```
 
+Retrieve unique users by a device:
+
+```java
+  JSONObject uniques = sdk.getUniques(deviceId);
+  System.out.println("This is our getuniques response_id: " + uniquesInfo.getString("response_id"));
+  JSONArray uniques = uniquesInfo.getJSONArray("uniques");
+  for (int i = 0; i < uniques.size(); i++) {
+    JSONObject device = uniques.getJSONObject(i);
+    System.out.println("Unique " + i);
+    System.out.println("Unique (user):" + device.get("unique"));
+    System.out.println("Date last seen:" + device.get("datelastseen"));
+    System.out.println("Trusted state:" + device.get("truststate"));
+  }
+```
+
 Get velocity for one of our customers:
 ```java
   // for greater security, username and password are internally hashed before transmitting the request
