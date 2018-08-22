@@ -42,6 +42,22 @@ Retrieve device information collected by the Data Collector:
   System.out.println("Mobile: " + (deviceInformation.get("isMobile"))); // 1 (true) or 0 (false)
 ```
 
+Retrieve devices information related to a customer (uniq):
+
+```java
+  JSONObject devicesInfo = sdk.getDevices(uniq);
+  System.out.println("This is our getdevices response_id: " + devicesInfo.getString("response_id"));
+  JSONArray devices = devicesInfo.getJSONArray("devices");
+  for (int i = 0; i < devices.size(); i++) {
+    JSONObject device = devices.getJSONObject(i);
+    System.out.println("Device " + i);
+    System.out.println("ID (fingerprint):" + device.get("deviceid"));
+    System.out.println("Trusted state:" + device.get("truststate"));
+    System.out.println("Date first seen:" + device.get("datefirstseen"));
+    System.out.println("Friendly name:" + device.get("friendlyname"));
+  }
+```
+
 Get velocity for one of our customers:
 ```java
   // for greater security, username and password are internally hashed before transmitting the request
