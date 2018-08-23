@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -106,6 +107,9 @@ public class KountAccessExample {
 			// Setting a trust state for device by session
 			sdk.setDeviceTrustBySession(session, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
 
+			JSONObject devices = sdk.getDevices(uniq);
+			this.printDevicesInfo(devices);
+
 		} catch (AccessException ae) {
 			// These can be thrown if there were any issues making the request.
 			// See the AccessException class for more information.
@@ -153,6 +157,19 @@ public class KountAccessExample {
 		System.out.println("Got warnings: " + decision.get("warnings"));
 		System.out.println(
 				"Got decision: " + decision.getJSONObject("reply").getJSONObject("ruleEvents").get("decision"));
+	}
+
+	private void printDevicesInfo(JSONObject devicesInfo) {
+		System.out.println("This is our getdevices response_id: " + devicesInfo.getString("response_id"));
+		JSONArray devices = devicesInfo.getJSONArray("devices");
+		for (int i = 0; i < devices.size(); i++) {
+			JSONObject device = devices.getJSONObject(i);
+			System.out.println("Device " + i);
+			System.out.println("ID (fingerprint):" + device.get("deviceid"));
+			System.out.println("Trusted state:" + device.get("truststate"));
+			System.out.println("Date first seen:" + device.get("datefirstseen"));
+			System.out.println("Friendly name:" + device.get("friendlyname"));
+		}
 	}
 
 	/**

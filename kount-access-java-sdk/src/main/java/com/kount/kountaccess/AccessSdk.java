@@ -118,6 +118,11 @@ public class AccessSdk {
 	private final String deviceTrustBySessionEndpoint;
 
 	/**
+	 * getdevices endpoint
+	 */
+	private final String getDevicesEndpoint;
+
+	/**
 	 * Authorization header
 	 */
 	private String authorizationHeader;
@@ -159,6 +164,7 @@ public class AccessSdk {
 		this.decisionEndpoint = "https://" + host + "/api/decision";
 		this.deviceTrustByDeviceEndpoint = "https://" + host + "/api/devicetrustbydevice";
 		this.deviceTrustBySessionEndpoint = "https://" + host + "/api/devicetrustbysession";
+		this.getDevicesEndpoint = "https://" + host + "/api/getdevices";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -171,6 +177,7 @@ public class AccessSdk {
 		logger.debug("device endpoint: " + deviceEndpoint);
 		logger.debug("devicetrustbydevice endpoint: " + deviceTrustByDeviceEndpoint);
 		logger.debug("devicetrustbysession endpoint: " + deviceTrustBySessionEndpoint);
+		logger.debug("getdevices endpoint: " + getDevicesEndpoint);
 	}
 
 	/**
@@ -286,6 +293,61 @@ public class AccessSdk {
 
 		logger.debug("device info request: url = " + urlString);
 
+		long startTime = System.currentTimeMillis();
+		String response = this.getRequest(urlString);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
+		if (response != null) {
+			return processJSONEntity(response);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Gets an array of devices for the given uniq customer ID.
+	 *
+	 * @param deviceId
+	 *            Device ID(fingerprint).
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getDevices(String uniq) throws AccessException {
+		return getDevices(uniq, null);
+	}
+
+	/**
+	 * Gets an array of devices for the given uniq customer ID.
+	 *
+	 * @param deviceId
+	 *            Device ID(fingerprint).
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getDevices(String uniq, Map<String, String> additionalParameters) throws AccessException {
+		if ((uniq == null) || uniq.isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
+		}
+
+		StringBuilder parameters = new StringBuilder("?");
+		// version and uniq
+		parameters.append("v=").append(version).append("&uniq=").append(uniq);
+
+		// Add the additional parameters, if they exist.
+		if (additionalParameters != null) {
+			for (Map.Entry<String, String> entry : additionalParameters.entrySet()) {
+				parameters.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+			}
+		}
+
+		String urlString = getDevicesEndpoint + parameters;
+
+		logger.debug("getdevices request: url = " + urlString);
 		long startTime = System.currentTimeMillis();
 		String response = this.getRequest(urlString);
 		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
@@ -717,6 +779,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getDeviceInfo(String session) throws AccessException {
 		return getDevice(session);
 	}
@@ -736,6 +799,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password) throws AccessException {
 		return getVelocity(session, username, password, null);
 	}
@@ -758,6 +822,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password,
 			Map<String, String> additionalParams) throws AccessException {
 		return getVelocity(session, username, password, additionalParams);
