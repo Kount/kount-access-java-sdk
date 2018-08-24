@@ -128,6 +128,11 @@ public class AccessSdk {
 	private final String getUniquesEndpoint;
 
 	/**
+	 * Info endpoint
+	 */
+	private final String infoEndpoint;
+
+	/**
 	 * Authorization header
 	 */
 	private String authorizationHeader;
@@ -171,6 +176,7 @@ public class AccessSdk {
 		this.deviceTrustBySessionEndpoint = "https://" + host + "/api/devicetrustbysession";
 		this.getDevicesEndpoint = "https://" + host + "/api/getdevices";
 		this.getUniquesEndpoint = "https://" + host + "/api/getuniques";
+		this.infoEndpoint = "https://" + host + "/api/info";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -185,6 +191,7 @@ public class AccessSdk {
 		logger.debug("devicetrustbysession endpoint: " + deviceTrustBySessionEndpoint);
 		logger.debug("getdevices endpoint: " + getDevicesEndpoint);
 		logger.debug("getuniques endpoint: " + getUniquesEndpoint);
+		logger.debug("info endpoint: " + infoEndpoint);
 	}
 
 	/**
@@ -589,6 +596,101 @@ public class AccessSdk {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Gets the device info, threshold decision, velocity data, Trusted Device
+	 * information and/or BehavioSec. Which data sets will be returned depends
+	 * on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
+	 * identifier and the supplied for the session's username and password.
+	 *
+	 * @param infoFlag
+	 *            the requested set of data elements | int (bytes represented
+	 *            inside) | mandatory
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer identifier
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password)
+			throws AccessException {
+		return getInfo(infoFlag, session, uniq, username, password, null);
+	}
+
+	/**
+	 * Gets the device info, threshold decision, velocity data, Trusted Device
+	 * information and/or BehavioSec. Which data sets will be returned depends
+	 * on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
+	 * identifier and the supplied for the session's username and password.
+	 *
+	 * @param infoFlag
+	 *            the requested set of data elements | int (bytes represented
+	 *            inside) | mandatory
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer identifier
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password,
+			Map<String, String> additionalParameters) throws AccessException {
+
+		verifySessionId(session);
+		verifyInfoParams(infoFlag, uniq, username, password);
+
+		if (additionalParameters == null) {
+			additionalParameters = new HashMap<>();
+		}
+		additionalParameters.put("i", Integer.toString(infoFlag));
+		additionalParameters.put("uniq", uniq);
+
+		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
+		logger.debug("info request: host = " + infoEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
+		String response = this.postRequest(infoEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
+		if (response != null) {
+			return processJSONEntity(response);
+		}
+
+		return null;
+	}
+
+	private void verifyInfoParams(int infoFlag, String uniq, String username, String password) throws AccessException {
+		if ((infoFlag < 1) || (infoFlag > 31)) {
+			throw new AccessException(AccessErrorType.INVALID_DATA,
+					"Invalid infoFlag (" + infoFlag + ").  Must be an integer between 1 and 31 (including).");
+		}
+		if ((infoFlag > 7) && ((uniq == null) || uniq.isEmpty())) {
+			throw new AccessException(AccessErrorType.INVALID_DATA,
+					"Missing uniq (" + uniq + ").  Must be present for infoFlag > 7.");
+		}
+		if ((((infoFlag > 1) && (infoFlag < 8)) || ((infoFlag > 9) && (infoFlag < 16))
+				|| ((infoFlag > 17) && (infoFlag < 24)) || (infoFlag > 25))
+				&& (((username == null) || username.isEmpty()) && ((password == null) || password.isEmpty()))) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing username/password (" + username + "/"
+					+ password
+					+ ").  Must be present for infoFlag between 1 and 8, 9 and 16, 17 and 24 or bigger than 25.");
+		}
 	}
 
 	private void verifySessionId(String session) throws AccessException {
