@@ -104,6 +104,26 @@ public class SetDeviceTrustByDeviceTest {
 	}
 
 	/**
+	 * Test IllegalArgumentException with space for deviceId(fingerprint) Test
+	 * method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceSpaceForDeviceId() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(" ", uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
 	 * Test IllegalArgumentException for missing uniq(customer identifier) Test
 	 * method for
 	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
@@ -144,6 +164,26 @@ public class SetDeviceTrustByDeviceTest {
 	}
 
 	/**
+	 * Test IllegalArgumentException with space for uniq(customer identifier)
+	 * Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceSpaceForUniq() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, " ", AccessSdk.TRUSTED_STATE_TRUSTED);
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
 	 * Test IllegalArgumentException for missing trustedState Test method for
 	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
 	 */
@@ -175,6 +215,25 @@ public class SetDeviceTrustByDeviceTest {
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
 			sdk.setDeviceTrustByDevice(fingerprint, uniq, "");
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
+	/**
+	 * Test IllegalArgumentException with space for trustedState Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#setDeviceTrustByDevice(String, String, String)}
+	 */
+	@Test
+	public void testSetDeviceTrustByDeviceSpaceForTrustedState() {
+		try {
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpPost mockPost = mock(HttpPost.class);
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
+			sdk.setDeviceTrustByDevice(fingerprint, uniq, " ");
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
