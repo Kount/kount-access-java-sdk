@@ -91,7 +91,7 @@ Get velocity for one of our customers:
     "The number of unique user access request(s) this hour for this device is:" + numUsersForDevice);
 ```
 
-And last, the `decision` endpoint usage:
+The `decision` endpoint usage:
 
 ```java
   JSONObject decisionInfo = sdk.getDecision(sessionId, username, password); // those again are hashed internally
@@ -100,5 +100,35 @@ And last, the `decision` endpoint usage:
   System.out.println("warnings: " + decision.get("warnings"));
   // and the Kount Access decision itself
   System.out.println("decision: " + decision.getJSONObject("reply").getJSONObject("ruleEvents").get("decision"));
+```
+
+And last, the 'info' endpoint usage:
+
+```java
+  int infoFlag = new InfoEndpointDataSet().withInfo().withVelocity().withBehavioSec().withDecision().withTrustedDevice().build();
+  JSONObject info = sdk.getInfo(infoFlag, session, uniq, user, pass);
+  
+  //JSONObject for Decision is available
+  JSONObject decision = info.getJSONObject("decision");
+  
+  //Device info is available
+  JSONObject device = info.getJSONObject("device");
+  
+  //Trusted state
+  System.out.println("Trusted state: " + info.getJSONObject("trusted").get("state"));
+  
+  //Response ID
+  System.out.println("response_id:" + info.get("response_id"));
+  
+  //Velocity
+  JSONObject velocity = info.getJSONObject("velocity");
+  
+  //And behavioSec
+  JSONObject behavioSec = info.getJSONObject("behavioSec");
+  System.out.println("Is Bot:" + behavioSecData.get("isBot"));
+  System.out.println("Is Trained:" + behavioSecData.get("isTrained"));
+  System.out.println("Score:" + behavioSecData.get("score"));
+  System.out.println("Confidence:" + behavioSecData.get("confidence"));
+  System.out.println("Policy ID:" + behavioSecData.get("policyId"));
 ```
 

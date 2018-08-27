@@ -411,10 +411,10 @@ public class AccessSdk {
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
-		if ((deviceId == null) || deviceId.isEmpty()) {
+		if ((deviceId == null) || deviceId.isEmpty() || deviceId.trim().isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing deviceId.");
 		}
-		if ((uniq == null) || uniq.isEmpty()) {
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
 		}
 		verifyTrustedState(trustedState);
@@ -474,8 +474,8 @@ public class AccessSdk {
 	public void setDeviceTrustBySession(String session, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
 		verifySessionId(session);
-		if ((uniq == null) || uniq.isEmpty()) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing or empty uniq.");
 		}
 		verifyTrustedState(trustedState);
 
@@ -680,13 +680,14 @@ public class AccessSdk {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Invalid infoFlag (" + infoFlag + ").  Must be an integer between 1 and 31 (including).");
 		}
-		if ((infoFlag > 7) && ((uniq == null) || uniq.isEmpty())) {
+		if ((infoFlag > 7) && ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty())) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Missing uniq (" + uniq + ").  Must be present for infoFlag > 7.");
 		}
 		if ((((infoFlag > 1) && (infoFlag < 8)) || ((infoFlag > 9) && (infoFlag < 16))
 				|| ((infoFlag > 17) && (infoFlag < 24)) || (infoFlag > 25))
-				&& (((username == null) || username.isEmpty()) && ((password == null) || password.isEmpty()))) {
+				&& (((username == null) || username.isEmpty() || username.trim().isEmpty())
+						|| ((password == null) || password.isEmpty() || password.trim().isEmpty()))) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing username/password (" + username + "/"
 					+ password
 					+ ").  Must be present for infoFlag between 1 and 8, 9 and 16, 17 and 24 or bigger than 25.");

@@ -115,12 +115,35 @@ public class KountAccessExample {
 			JSONObject uniques = sdk.getUniques(deviceId);
 			this.printUniquesInfo(uniques);
 
+			// info endpoint example (requesting all data)
+			int infoFlag = new InfoEndpointDataSet().withInfo().withVelocity().withBehavioSec().withDecision()
+					.withTrustedDevice().build();
+			JSONObject info = sdk.getInfo(infoFlag, session, uniq, username, password);
+			printBehavioSec(info.getJSONObject("behavioSec"));
+			printDecisionInfo(info.getJSONObject("decision"));
+			printDeviceInfo(info.getJSONObject("device"));
+			System.out.println("Trusted state: " + info.getJSONObject("trusted").get("state"));
+			velocity = info.getJSONObject("velocity");
+			for (String type : entityTypes) {
+				this.printVelocityInfo(type, velocity.getJSONObject(type));
+			}
+			System.out.println("response_id:" + info.get("response_id"));
+
 		} catch (AccessException ae) {
 			// These can be thrown if there were any issues making the request.
 			// See the AccessException class for more information.
 			System.out.println("ERROR Type: " + ae.getAccessErrorType());
 			System.out.println("ERROR: " + ae.getMessage());
 		}
+	}
+
+	private void printBehavioSec(JSONObject behavioSecData) {
+		System.out.println("Behavio Sec Data");
+		System.out.println("Is Bot:" + behavioSecData.get("isBot"));
+		System.out.println("Is Trained:" + behavioSecData.get("isTrained"));
+		System.out.println("Score:" + behavioSecData.get("score"));
+		System.out.println("Confidence:" + behavioSecData.get("confidence"));
+		System.out.println("Policy ID:" + behavioSecData.get("policyId"));
 	}
 
 	/**
