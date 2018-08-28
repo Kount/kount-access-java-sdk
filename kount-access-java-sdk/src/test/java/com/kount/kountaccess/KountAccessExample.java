@@ -107,8 +107,13 @@ public class KountAccessExample {
 			// Setting a trust state for device by session
 			sdk.setDeviceTrustBySession(session, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
 
+			// getdevices Endpoint Example
 			JSONObject devices = sdk.getDevices(uniq);
 			this.printDevicesInfo(devices);
+
+			// getuniques Endpoint Example
+			JSONObject uniques = sdk.getUniques(deviceId);
+			this.printUniquesInfo(uniques);
 
 		} catch (AccessException ae) {
 			// These can be thrown if there were any issues making the request.
@@ -169,6 +174,18 @@ public class KountAccessExample {
 			System.out.println("Trusted state:" + device.get("truststate"));
 			System.out.println("Date first seen:" + device.get("datefirstseen"));
 			System.out.println("Friendly name:" + device.get("friendlyname"));
+		}
+	}
+
+	private void printUniquesInfo(JSONObject uniquesInfo) {
+		System.out.println("This is our getuniques response_id: " + uniquesInfo.getString("response_id"));
+		JSONArray uniques = uniquesInfo.getJSONArray("uniques");
+		for (int i = 0; i < uniques.size(); i++) {
+			JSONObject device = uniques.getJSONObject(i);
+			System.out.println("Unique " + i);
+			System.out.println("Unique (user):" + device.get("unique"));
+			System.out.println("Date last seen:" + device.get("datelastseen"));
+			System.out.println("Trusted state:" + device.get("truststate"));
 		}
 	}
 

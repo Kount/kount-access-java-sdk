@@ -123,6 +123,11 @@ public class AccessSdk {
 	private final String getDevicesEndpoint;
 
 	/**
+	 * getuniques endpoint
+	 */
+	private final String getUniquesEndpoint;
+
+	/**
 	 * Authorization header
 	 */
 	private String authorizationHeader;
@@ -165,6 +170,7 @@ public class AccessSdk {
 		this.deviceTrustByDeviceEndpoint = "https://" + host + "/api/devicetrustbydevice";
 		this.deviceTrustBySessionEndpoint = "https://" + host + "/api/devicetrustbysession";
 		this.getDevicesEndpoint = "https://" + host + "/api/getdevices";
+		this.getUniquesEndpoint = "https://" + host + "/api/getuniques";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -178,6 +184,7 @@ public class AccessSdk {
 		logger.debug("devicetrustbydevice endpoint: " + deviceTrustByDeviceEndpoint);
 		logger.debug("devicetrustbysession endpoint: " + deviceTrustBySessionEndpoint);
 		logger.debug("getdevices endpoint: " + getDevicesEndpoint);
+		logger.debug("getuniques endpoint: " + getUniquesEndpoint);
 	}
 
 	/**
@@ -521,6 +528,61 @@ public class AccessSdk {
 		logger.debug("decision request: host = " + decisionEndpoint + ", parameters = " + parameters.toString());
 		long startTime = System.currentTimeMillis();
 		String response = this.postRequest(decisionEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
+		if (response != null) {
+			return processJSONEntity(response);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Gets an array of uniq customer IDs for the given deviceId.
+	 *
+	 * @param deviceId
+	 *            Device ID(fingerprint).
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getUniques(String deviceId) throws AccessException {
+		return getUniques(deviceId, null);
+	}
+
+	/**
+	 * Gets an array of uniq customer IDs for the given deviceId.
+	 *
+	 * @param deviceId
+	 *            Device ID(fingerprint).
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getUniques(String deviceId, Map<String, String> additionalParameters) throws AccessException {
+		if ((deviceId == null) || deviceId.isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing deviceId.");
+		}
+
+		StringBuilder parameters = new StringBuilder("?");
+		// version and deviceId
+		parameters.append("v=").append(version).append("&d=").append(deviceId);
+
+		// Add the additional parameters, if they exist.
+		if (additionalParameters != null) {
+			for (Map.Entry<String, String> entry : additionalParameters.entrySet()) {
+				parameters.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+			}
+		}
+
+		String urlString = getUniquesEndpoint + parameters;
+
+		logger.debug("getuniques request: url = " + urlString);
+		long startTime = System.currentTimeMillis();
+		String response = this.getRequest(urlString);
 		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
 		if (response != null) {
 			return processJSONEntity(response);
