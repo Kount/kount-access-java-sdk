@@ -115,6 +115,12 @@ public class KountAccessExample {
 			JSONObject uniques = sdk.getUniques(deviceId);
 			this.printUniquesInfo(uniques);
 
+			// behavio/data endpoint example
+			String behavioHost = "api.behavio.kaptcha.com";
+			String environment = "sandbox";
+			String timing = "{\"valid\":\"json\"}";
+			sdk.setBehaviorData(behavioHost, environment, session, timing, uniq);
+
 			// info endpoint example (requesting all data)
 			int infoFlag = new InfoEndpointDataSet().withInfo().withVelocity().withBehavioSec().withDecision()
 					.withTrustedDevice().build();

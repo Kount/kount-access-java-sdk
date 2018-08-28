@@ -25,8 +25,16 @@ Set the trusted state of a device by its id:
 
 Set the trusted state of a device by session ID:
 
-```
+```java
   sdk.setDeviceTrustBySession(sessionId, uniq, AccessSdk.TRUSTED_STATE_TRUSTED);
+```
+
+Set behaviour data collected for a customer:
+```java
+  String behavioHost = "api.behavio.kaptcha.com";
+  String environment = "sandbox";
+  String timing = "{\"valid\":\"json\"}";
+  sdk.setBehaviorData(behavioHost, environment, session, timing, uniq);
 ```
 
 Retrieve device information collected by the Data Collector:

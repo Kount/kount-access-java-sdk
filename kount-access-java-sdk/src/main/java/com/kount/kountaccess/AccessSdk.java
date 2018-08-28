@@ -73,6 +73,16 @@ public class AccessSdk {
 	public static final String TRUSTED_STATE_BANNED = "banned";
 
 	/**
+	 * Bahavio Data Endpoint Prefix
+	 */
+	private static final String BEHAVIO_DATA_ENDPOINT_PREFIX = "https://";
+
+	/**
+	 * Bahavio Data Endpoint Postfix
+	 */
+	private static final String BEHAVIO_DATA_ENDPOINT_POSTFIX = "/behavio/data";
+
+	/**
 	 * Merchant's ID
 	 */
 	private int merchantId;
@@ -599,6 +609,72 @@ public class AccessSdk {
 	}
 
 	/**
+	 * Sets behavio data for a uniq customer identifier.
+	 *
+	 * @param host
+	 *            of the behavio data endpoint
+	 * @param environment
+	 *            as in
+	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param timing
+	 *            data gathered from a BehavioSec collection
+	 * @param uniq
+	 *            customer identifier
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public void setBehaviorData(String host, String environment, String session, String timing, String uniq)
+			throws AccessException {
+		setBehaviorData(host, environment, session, timing, uniq, null);
+	}
+
+	/**
+	 * Sets behavio data for a uniq customer identifier.
+	 *
+	 * @param host
+	 *            of the behavio data endpoint
+	 * @param environment
+	 *            as in
+	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param timing
+	 *            data gathered from a BehavioSec collection
+	 * @param uniq
+	 *            customer identifier
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	private void setBehaviorData(String host, String environment, String session, String timing, String uniq,
+			Map<String, String> additionalParameters) throws AccessException {
+		verifySessionId(session);
+		verifyBehavioData(host, environment, timing, uniq);
+
+		if (additionalParameters == null) {
+			additionalParameters = new HashMap<>();
+		}
+		additionalParameters.put("m", Integer.toString(merchantId));
+		additionalParameters.put("timing", timing);
+		additionalParameters.put("uniq", uniq);
+
+		List<NameValuePair> parameters = createRequestParameters(session, null, null, additionalParameters);
+		String behavioDataEndpoint = BEHAVIO_DATA_ENDPOINT_PREFIX + host + "/" + environment
+				+ BEHAVIO_DATA_ENDPOINT_POSTFIX;
+		logger.debug("info request: host = " + behavioDataEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
+		this.postRequest(behavioDataEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime));
+	}
+
+	/**
 	 * Gets the device info, threshold decision, velocity data, Trusted Device
 	 * information and/or BehavioSec. Which data sets will be returned depends
 	 * on the infoFlag that is build with
@@ -709,6 +785,26 @@ public class AccessSdk {
 				|| TRUSTED_STATE_BANNED.equals(trustedState))) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid trustedState (" + trustedState
 					+ "). Must be one of the following values: " + TRUSTED_STATE_TRUSTED + ".");
+		}
+	}
+
+	private void verifyBehavioData(String host, String environment, String timing, String uniq) throws AccessException {
+		if ((host == null) || host.isEmpty() || host.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host.");
+		}
+		if ((environment == null) || environment.isEmpty() || environment.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing environment.");
+		}
+		if ((timing == null) || timing.isEmpty() || timing.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing timing data.");
+		}
+		try {
+			JSONObject.fromObject(timing);
+		} catch (JSONException e) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Timing is not a valid json.");
+		}
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq customer identifier.");
 		}
 	}
 
@@ -832,6 +928,7 @@ public class AccessSdk {
 			CloseableHttpClient client = getHttpClient();
 			HttpPost request = getHttpPost(urlString);
 			request.addHeader("Authorization", this.getAuthorizationHeader());
+			// request.addHeader("Accept", "application/x-www-form-urlencoded");
 			HttpEntity entity = new UrlEncodedFormEntity(values);
 			request.setEntity(entity);
 
@@ -944,7 +1041,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getDeviceInfo(String session) throws AccessException {
 		return getDevice(session);
 	}
@@ -964,7 +1060,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password) throws AccessException {
 		return getVelocity(session, username, password, null);
 	}
@@ -987,7 +1082,6 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
-	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password,
 			Map<String, String> additionalParams) throws AccessException {
 		return getVelocity(session, username, password, additionalParams);
