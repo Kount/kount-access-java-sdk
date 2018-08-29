@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
@@ -799,9 +800,13 @@ public class AccessSdk {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing timing data.");
 		}
 		try {
-			JSONObject.fromObject(timing);
+			if (timing.startsWith("[")) {
+				JSONArray.fromObject(timing);
+			} else {
+				JSONObject.fromObject(timing);
+			}
 		} catch (JSONException e) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Timing is not a valid json.");
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Timing is not a valid json.", e);
 		}
 		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq customer identifier.");
@@ -1041,6 +1046,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getDeviceInfo(String session) throws AccessException {
 		return getDevice(session);
 	}
@@ -1060,6 +1066,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password) throws AccessException {
 		return getVelocity(session, username, password, null);
 	}
@@ -1082,6 +1089,7 @@ public class AccessSdk {
 	 * @throws AccessException
 	 *             Thrown if any of the param values are invalid or there was a problem getting a response.
 	 */
+	@Deprecated
 	public JSONObject getAccessData(String session, String username, String password,
 			Map<String, String> additionalParams) throws AccessException {
 		return getVelocity(session, username, password, additionalParams);

@@ -54,6 +54,23 @@ public class AccessException extends Exception {
 	}
 
 	/**
+	 * Custom exception for problems encountered while using the Kount Access
+	 * API.
+	 *
+	 * @param errorType
+	 *            The Error type that was thrown
+	 * @param message
+	 *            Additional information about the error condition.
+	 * @param e
+	 *            source exception
+	 */
+	public AccessException(AccessErrorType errorType, String message, Exception e) {
+		super(message, e);
+		this.error = errorType;
+
+	}
+
+	/**
 	 * Returns the specific AccessErrorType
 	 *
 	 * @return The error type
