@@ -628,9 +628,9 @@ public class AccessSdk {
 	 *             Thrown if any of the parameter values are invalid or there
 	 *             was a problem getting a response.
 	 */
-	public void setBehaviorData(String host, String environment, String session, String timing, String uniq)
+	public void setBehavioData(String host, String environment, String session, String timing, String uniq)
 			throws AccessException {
-		setBehaviorData(host, environment, session, timing, uniq, null);
+		setBehavioData(host, environment, session, timing, uniq, null);
 	}
 
 	/**
@@ -654,7 +654,7 @@ public class AccessSdk {
 	 *             Thrown if any of the parameter values are invalid or there
 	 *             was a problem getting a response.
 	 */
-	private void setBehaviorData(String host, String environment, String session, String timing, String uniq,
+	private void setBehavioData(String host, String environment, String session, String timing, String uniq,
 			Map<String, String> additionalParameters) throws AccessException {
 		verifySessionId(session);
 		verifyBehavioData(host, environment, timing, uniq);
@@ -757,17 +757,27 @@ public class AccessSdk {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
 					"Invalid infoFlag (" + infoFlag + ").  Must be an integer between 1 and 31 (including).");
 		}
-		if ((infoFlag > 7) && ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty())) {
-			throw new AccessException(AccessErrorType.INVALID_DATA,
-					"Missing uniq (" + uniq + ").  Must be present for infoFlag > 7.");
+
+		int behavio = new InfoEndpointDataSet().withBehavioSec().build();
+		int decision = new InfoEndpointDataSet().withDecision().build();
+		int trusted = new InfoEndpointDataSet().withTrustedDevice().build();
+		int velocity = new InfoEndpointDataSet().withVelocity().build();
+
+		// uniq is required for trusted and behavio request
+		if (((infoFlag & trusted) == trusted) || ((infoFlag & behavio) == behavio)) {
+			if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+				throw new AccessException(AccessErrorType.INVALID_DATA,
+						"Missing uniq (" + uniq + ").  Must be present for trusted and behavio requests.");
+			}
 		}
-		if ((((infoFlag > 1) && (infoFlag < 8)) || ((infoFlag > 9) && (infoFlag < 16))
-				|| ((infoFlag > 17) && (infoFlag < 24)) || (infoFlag > 25))
-				&& (((username == null) || username.isEmpty() || username.trim().isEmpty())
-						|| ((password == null) || password.isEmpty() || password.trim().isEmpty()))) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing username/password (" + username + "/"
-					+ password
-					+ ").  Must be present for infoFlag between 1 and 8, 9 and 16, 17 and 24 or bigger than 25.");
+
+		// user and password are required for velocity and decision
+		if (((infoFlag & velocity) == velocity) || ((infoFlag & decision) == decision)) {
+			if ((username == null) || username.isEmpty() || username.trim().isEmpty() || (password == null)
+					|| password.isEmpty() || password.trim().isEmpty()) {
+				throw new AccessException(AccessErrorType.INVALID_DATA, "Missing username/password (" + username + "/"
+						+ password + ").  Must be present for velocity and decision requests.");
+			}
 		}
 	}
 
@@ -933,7 +943,6 @@ public class AccessSdk {
 			CloseableHttpClient client = getHttpClient();
 			HttpPost request = getHttpPost(urlString);
 			request.addHeader("Authorization", this.getAuthorizationHeader());
-			// request.addHeader("Accept", "application/x-www-form-urlencoded");
 			HttpEntity entity = new UrlEncodedFormEntity(values);
 			request.setEntity(entity);
 

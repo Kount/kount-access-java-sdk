@@ -26,9 +26,9 @@ import com.kount.kountaccess.AccessException.AccessErrorType;
  *
  * @author Stanislav Milev
  */
-public class SetBehaviorDataTest {
+public class SetBehavioDataTest {
 
-	private static final Logger logger = Logger.getLogger(SetBehaviorDataTest.class);
+	private static final Logger logger = Logger.getLogger(SetBehavioDataTest.class);
 
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";
@@ -43,10 +43,10 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataHappyPath() {
+	public void testSetBehavioDataHappyPath() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
@@ -59,7 +59,7 @@ public class SetBehaviorDataTest {
 			doReturn("").when(sdk).getResponseAsString(mockResponse);
 			doReturn(mockStatus).when(mockResponse).getStatusLine();
 			doReturn(200).when(mockStatus).getStatusCode();
-			sdk.setBehaviorData(behavioHost, environment, session, timing, uniq);
+			sdk.setBehavioData(behavioHost, environment, session, timing, uniq);
 		} catch (IOException ioe) {
 			fail("Exception:" + ioe.getMessage());
 		} catch (AccessException ae) {
@@ -69,7 +69,7 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for missing behavioHost Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
 	public void testSetBehaviorDataMissingBehavioHost() {
@@ -79,7 +79,7 @@ public class SetBehaviorDataTest {
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(null, environment, session, timing, uniq);
+			sdk.setBehavioData(null, environment, session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			ae.printStackTrace();
@@ -89,17 +89,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for blank behavioHost Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataBlankBehavioHost() {
+	public void testSetBehavioDataBlankBehavioHost() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData("", environment, session, timing, uniq);
+			sdk.setBehavioData("", environment, session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -108,17 +108,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with space for behavioHost Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataSpaceForBehavioHost() {
+	public void testSetBehavioDataSpaceForBehavioHost() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(" ", environment, session, timing, uniq);
+			sdk.setBehavioData(" ", environment, session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -127,17 +127,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for missing environment Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataMissingEnvironment() {
+	public void testSetBehavioDataMissingEnvironment() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, null, session, timing, uniq);
+			sdk.setBehavioData(behavioHost, null, session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			ae.printStackTrace();
@@ -147,17 +147,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for blank environment Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataBlankEnvironment() {
+	public void testSetBehavioDataBlankEnvironment() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, "", session, timing, uniq);
+			sdk.setBehavioData(behavioHost, "", session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -166,17 +166,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with space for environment Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataSpaceForEnvironment() {
+	public void testSetBehavioDataSpaceForEnvironment() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, " ", session, timing, uniq);
+			sdk.setBehavioData(behavioHost, " ", session, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -185,17 +185,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for missing session Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataMissingSession() {
+	public void testSetBehavioDataMissingSession() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, null, timing, uniq);
+			sdk.setBehavioData(behavioHost, environment, null, timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			ae.printStackTrace();
@@ -205,17 +205,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for blank session Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataBlankSession() {
+	public void testSetBehavioDataBlankSession() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, "", timing, uniq);
+			sdk.setBehavioData(behavioHost, environment, "", timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -224,17 +224,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with space for session Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataSpaceForSession() {
+	public void testSetBehavioDataSpaceForSession() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, " ", timing, uniq);
+			sdk.setBehavioData(behavioHost, environment, " ", timing, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -243,17 +243,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for missing timing Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataMissingTiming() {
+	public void testSetBehavioDataMissingTiming() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, null, uniq);
+			sdk.setBehavioData(behavioHost, environment, session, null, uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			ae.printStackTrace();
@@ -263,17 +263,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for blank timing Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataBlankTiming() {
+	public void testSetBehavioDataBlankTiming() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, "", uniq);
+			sdk.setBehavioData(behavioHost, environment, session, "", uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -282,17 +282,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with space for timing Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataSpaceForTiming() {
+	public void testSetBehavioDataSpaceForTiming() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, " ", uniq);
+			sdk.setBehavioData(behavioHost, environment, session, " ", uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -301,17 +301,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with not a json for timing Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataNotJSONTiming() {
+	public void testSetBehavioDataNotJSONTiming() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, "not a json", uniq);
+			sdk.setBehavioData(behavioHost, environment, session, "not a json", uniq);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -320,17 +320,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for missing uniq Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataMissingUniq() {
+	public void testSetBehavioDataMissingUniq() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, timing, null);
+			sdk.setBehavioData(behavioHost, environment, session, timing, null);
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			ae.printStackTrace();
@@ -340,17 +340,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException for blank uniq Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataBlankUniq() {
+	public void testSetBehavioDataBlankUniq() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, timing, "");
+			sdk.setBehavioData(behavioHost, environment, session, timing, "");
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
@@ -359,17 +359,17 @@ public class SetBehaviorDataTest {
 
 	/**
 	 * Test IllegalArgumentException with space for uniq Test method for
-	 * {@link com.kount.kountaccess.AccessSdk#setBehaviorData(String, String, String, String, String)}
+	 * {@link com.kount.kountaccess.AccessSdk#setBehavioData(String, String, String, String, String)}
 	 */
 	@Test
-	public void testSetBehaviorDataSpaceForUniq() {
+	public void testSetBehavioDataSpaceForUniq() {
 		try {
 			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
 			HttpPost mockPost = mock(HttpPost.class);
 			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
 			doReturn(mockHttpClient).when(sdk).getHttpClient();
 			doReturn(mockPost).when(sdk).getHttpPost(accessUrl);
-			sdk.setBehaviorData(behavioHost, environment, session, timing, " ");
+			sdk.setBehavioData(behavioHost, environment, session, timing, " ");
 			fail("Exception Not thrown");
 		} catch (AccessException ae) {
 			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
