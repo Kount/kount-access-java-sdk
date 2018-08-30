@@ -139,4 +139,27 @@ public class GetDevicesTest {
 		}
 	}
 
+	/**
+	 * Test IllegalArgumentException with space for uniq Test method for
+	 * {@link com.kount.kountaccess.AccessSdk#getDevices(java.lang.String)}.
+	 */
+	@Test
+	public void testGetDevicesSpaceForUniq() {
+		try {
+			// class to test
+			AccessSdk sdk = spy(new AccessSdk(host, merchantId, apiKey));
+			// mock objects
+			CloseableHttpClient mockHttpClient = mock(CloseableHttpClient.class);
+			HttpGet mockGet = mock(HttpGet.class);
+			// mock responses
+			doReturn(mockHttpClient).when(sdk).getHttpClient();
+			doReturn(mockGet).when(sdk).getHttpGet(sessionUrl);
+			// test method
+			sdk.getDevices(" ");
+			fail("Exception Not thrown");
+		} catch (AccessException ae) {
+			assertEquals(AccessErrorType.INVALID_DATA, ae.getAccessErrorType());
+		}
+	}
+
 }

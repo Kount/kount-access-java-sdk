@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
@@ -71,6 +72,16 @@ public class AccessSdk {
 	 * Trusted state - banned.
 	 */
 	public static final String TRUSTED_STATE_BANNED = "banned";
+
+	/**
+	 * Bahavio Data Endpoint Prefix
+	 */
+	private static final String BEHAVIO_DATA_ENDPOINT_PREFIX = "https://";
+
+	/**
+	 * Bahavio Data Endpoint Postfix
+	 */
+	private static final String BEHAVIO_DATA_ENDPOINT_POSTFIX = "/behavio/data";
 
 	/**
 	 * Merchant's ID
@@ -128,6 +139,11 @@ public class AccessSdk {
 	private final String getUniquesEndpoint;
 
 	/**
+	 * Info endpoint
+	 */
+	private final String infoEndpoint;
+
+	/**
 	 * Authorization header
 	 */
 	private String authorizationHeader;
@@ -171,6 +187,7 @@ public class AccessSdk {
 		this.deviceTrustBySessionEndpoint = "https://" + host + "/api/devicetrustbysession";
 		this.getDevicesEndpoint = "https://" + host + "/api/getdevices";
 		this.getUniquesEndpoint = "https://" + host + "/api/getuniques";
+		this.infoEndpoint = "https://" + host + "/api/info";
 
 		this.merchantId = merchantId;
 		this.apiKey = apiKey;
@@ -185,6 +202,7 @@ public class AccessSdk {
 		logger.debug("devicetrustbysession endpoint: " + deviceTrustBySessionEndpoint);
 		logger.debug("getdevices endpoint: " + getDevicesEndpoint);
 		logger.debug("getuniques endpoint: " + getUniquesEndpoint);
+		logger.debug("info endpoint: " + infoEndpoint);
 	}
 
 	/**
@@ -404,10 +422,10 @@ public class AccessSdk {
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
-		if ((deviceId == null) || deviceId.isEmpty()) {
+		if ((deviceId == null) || deviceId.isEmpty() || deviceId.trim().isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing deviceId.");
 		}
-		if ((uniq == null) || uniq.isEmpty()) {
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
 		}
 		verifyTrustedState(trustedState);
@@ -467,8 +485,8 @@ public class AccessSdk {
 	public void setDeviceTrustBySession(String session, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
 		verifySessionId(session);
-		if ((uniq == null) || uniq.isEmpty()) {
-			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq.");
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing or empty uniq.");
 		}
 		verifyTrustedState(trustedState);
 
@@ -591,6 +609,178 @@ public class AccessSdk {
 		return null;
 	}
 
+	/**
+	 * Sets behavio data for a uniq customer identifier.
+	 *
+	 * @param host
+	 *            of the behavio data endpoint
+	 * @param environment
+	 *            as in
+	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param timing
+	 *            data gathered from a BehavioSec collection
+	 * @param uniq
+	 *            customer identifier
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public void setBehavioData(String host, String environment, String session, String timing, String uniq)
+			throws AccessException {
+		setBehavioData(host, environment, session, timing, uniq, null);
+	}
+
+	/**
+	 * Sets behavio data for a uniq customer identifier.
+	 *
+	 * @param host
+	 *            of the behavio data endpoint
+	 * @param environment
+	 *            as in
+	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param timing
+	 *            data gathered from a BehavioSec collection
+	 * @param uniq
+	 *            customer identifier
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	private void setBehavioData(String host, String environment, String session, String timing, String uniq,
+			Map<String, String> additionalParameters) throws AccessException {
+		verifySessionId(session);
+		verifyBehavioData(host, environment, timing, uniq);
+
+		if (additionalParameters == null) {
+			additionalParameters = new HashMap<>();
+		}
+		additionalParameters.put("m", Integer.toString(merchantId));
+		additionalParameters.put("timing", timing);
+		additionalParameters.put("uniq", uniq);
+
+		List<NameValuePair> parameters = createRequestParameters(session, null, null, additionalParameters);
+		String behavioDataEndpoint = BEHAVIO_DATA_ENDPOINT_PREFIX + host + "/" + environment
+				+ BEHAVIO_DATA_ENDPOINT_POSTFIX;
+		logger.debug("info request: host = " + behavioDataEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
+		this.postRequest(behavioDataEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime));
+	}
+
+	/**
+	 * Gets the device info, threshold decision, velocity data, Trusted Device
+	 * information and/or BehavioSec. Which data sets will be returned depends
+	 * on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
+	 * identifier and the supplied for the session's username and password.
+	 *
+	 * @param infoFlag
+	 *            the requested set of data elements | int (bytes represented
+	 *            inside) | mandatory
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer identifier
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password)
+			throws AccessException {
+		return getInfo(infoFlag, session, uniq, username, password, null);
+	}
+
+	/**
+	 * Gets the device info, threshold decision, velocity data, Trusted Device
+	 * information and/or BehavioSec. Which data sets will be returned depends
+	 * on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
+	 * identifier and the supplied for the session's username and password.
+	 *
+	 * @param infoFlag
+	 *            the requested set of data elements | int (bytes represented
+	 *            inside) | mandatory
+	 * @param session
+	 *            The Session ID generated for the Data Collector service.
+	 * @param uniq
+	 *            customer identifier
+	 * @param username
+	 *            The username of the user.
+	 * @param password
+	 *            The password of the user.
+	 * @param additionalParameters
+	 *            Additional parameters to send to server.
+	 * @return A JSONObject containing the response.
+	 * @throws AccessException
+	 *             Thrown if any of the parameter values are invalid or there
+	 *             was a problem getting a response.
+	 */
+	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password,
+			Map<String, String> additionalParameters) throws AccessException {
+
+		verifySessionId(session);
+		verifyInfoParams(infoFlag, uniq, username, password);
+
+		if (additionalParameters == null) {
+			additionalParameters = new HashMap<>();
+		}
+		additionalParameters.put("i", Integer.toString(infoFlag));
+		additionalParameters.put("uniq", uniq);
+
+		List<NameValuePair> parameters = createRequestParameters(session, username, password, additionalParameters);
+		logger.debug("info request: host = " + infoEndpoint + ", parameters = " + parameters.toString());
+		long startTime = System.currentTimeMillis();
+		String response = this.postRequest(infoEndpoint, parameters);
+		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime) + ", response = " + response);
+		if (response != null) {
+			return processJSONEntity(response);
+		}
+
+		return null;
+	}
+
+	private void verifyInfoParams(int infoFlag, String uniq, String username, String password) throws AccessException {
+		if ((infoFlag < 1) || (infoFlag > 31)) {
+			throw new AccessException(AccessErrorType.INVALID_DATA,
+					"Invalid infoFlag (" + infoFlag + ").  Must be an integer between 1 and 31 (including).");
+		}
+
+		int behavio = new InfoEndpointDataSet().withBehavioSec().build();
+		int decision = new InfoEndpointDataSet().withDecision().build();
+		int trusted = new InfoEndpointDataSet().withTrustedDevice().build();
+		int velocity = new InfoEndpointDataSet().withVelocity().build();
+
+		// uniq is required for trusted and behavio request
+		if (((infoFlag & trusted) == trusted) || ((infoFlag & behavio) == behavio)) {
+			if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+				throw new AccessException(AccessErrorType.INVALID_DATA,
+						"Missing uniq (" + uniq + ").  Must be present for trusted and behavio requests.");
+			}
+		}
+
+		// user and password are required for velocity and decision
+		if (((infoFlag & velocity) == velocity) || ((infoFlag & decision) == decision)) {
+			if ((username == null) || username.isEmpty() || username.trim().isEmpty() || (password == null)
+					|| password.isEmpty() || password.trim().isEmpty()) {
+				throw new AccessException(AccessErrorType.INVALID_DATA, "Missing username/password (" + username + "/"
+						+ password + ").  Must be present for velocity and decision requests.");
+			}
+		}
+	}
+
 	private void verifySessionId(String session) throws AccessException {
 		if ((session == null) || (session.length() != 32)) {
 			throw new AccessException(AccessErrorType.INVALID_DATA,
@@ -606,6 +796,30 @@ public class AccessSdk {
 				|| TRUSTED_STATE_BANNED.equals(trustedState))) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid trustedState (" + trustedState
 					+ "). Must be one of the following values: " + TRUSTED_STATE_TRUSTED + ".");
+		}
+	}
+
+	private void verifyBehavioData(String host, String environment, String timing, String uniq) throws AccessException {
+		if ((host == null) || host.isEmpty() || host.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host.");
+		}
+		if ((environment == null) || environment.isEmpty() || environment.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing environment.");
+		}
+		if ((timing == null) || timing.isEmpty() || timing.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing timing data.");
+		}
+		try {
+			if (timing.startsWith("[")) {
+				JSONArray.fromObject(timing);
+			} else {
+				JSONObject.fromObject(timing);
+			}
+		} catch (JSONException e) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Timing is not a valid json.", e);
+		}
+		if ((uniq == null) || uniq.isEmpty() || uniq.trim().isEmpty()) {
+			throw new AccessException(AccessErrorType.INVALID_DATA, "Missing uniq customer identifier.");
 		}
 	}
 
