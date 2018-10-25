@@ -32,6 +32,10 @@ public class AccessException extends Exception {
 		 * Missing or malformed data (bad hostnames, missing/empty fields)
 		 */
 		INVALID_DATA,
+		/**
+		 * Internal error
+		 */
+		INTERNAL_ERROR,
 	}
 
 	/**
