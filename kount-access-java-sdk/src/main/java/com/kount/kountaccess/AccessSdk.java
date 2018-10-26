@@ -149,8 +149,7 @@ public class AccessSdk {
 	private String authorizationHeader;
 
 	/**
-	 * Creates an instance of the AccessSdk associated with a specific host and
-	 * merchant.
+	 * Creates an instance of the AccessSdk associated with a specific host and merchant.
 	 *
 	 * @param host
 	 *            FQDN of the host that AccessSdk will communicate with.
@@ -159,8 +158,7 @@ public class AccessSdk {
 	 * @param apiKey
 	 *            The API Key for the merchant.
 	 * @throws AccessException
-	 *             Thrown if any of the values are invalid.
-	 *             ({@link AccessErrorType#INVALID_DATA}).
+	 *             Thrown if any of the values are invalid. ({@link AccessErrorType#INVALID_DATA}).
 	 */
 	public AccessSdk(String host, int merchantId, String apiKey) throws AccessException {
 		if ((host == null) || host.isEmpty()) {
@@ -335,8 +333,7 @@ public class AccessSdk {
 	 *            Device ID(fingerprint).
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getDevices(String uniq) throws AccessException {
 		return getDevices(uniq, null);
@@ -351,8 +348,7 @@ public class AccessSdk {
 	 *            Additional parameters to send to server.
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getDevices(String uniq, Map<String, String> additionalParameters) throws AccessException {
 		if ((uniq == null) || uniq.isEmpty()) {
@@ -391,34 +387,30 @@ public class AccessSdk {
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and
-	 *            banned)
+	 *            trusted state (possible values: trusted, not_trusted and banned)
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState) throws AccessException {
 		setDeviceTrustByDevice(deviceId, uniq, trustedState, null);
 	}
 
 	/**
-	 * devicetrustbydevice Endpoint. Sets the device trusted state by device id.
-	 * Contains argument for passing additional parameters.
+	 * devicetrustbydevice Endpoint. Sets the device trusted state by device id. Contains argument for passing
+	 * additional parameters.
 	 *
 	 * @param deviceId
 	 *            Device ID(fingerprint).
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and
-	 *            banned)
+	 *            trusted state (possible values: trusted, not_trusted and banned)
 	 * @param additionalParameters
 	 *            Additional parameters to send to server.
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public void setDeviceTrustByDevice(String deviceId, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
@@ -453,34 +445,30 @@ public class AccessSdk {
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and
-	 *            banned)
+	 *            trusted state (possible values: trusted, not_trusted and banned)
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public void setDeviceTrustBySession(String session, String uniq, String trustedState) throws AccessException {
 		setDeviceTrustBySession(session, uniq, trustedState, null);
 	}
 
 	/**
-	 * devicetrustbysession Endpoint. Sets device trusted state by session.
-	 * Contains argument for passing additional parameters.
+	 * devicetrustbysession Endpoint. Sets device trusted state by session. Contains argument for passing additional
+	 * parameters.
 	 *
 	 * @param session
 	 *            The Session ID generated for the Data Collector service.
 	 * @param uniq
 	 *            customer IDs
 	 * @param trustedState
-	 *            trusted state (possible values: trusted, not_trusted and
-	 *            banned)
+	 *            trusted state (possible values: trusted, not_trusted and banned)
 	 * @param additionalParameters
 	 *            Additional parameters to send to server.
 	 * @return The JSONObject with data about the device.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public void setDeviceTrustBySession(String session, String uniq, String trustedState,
 			Map<String, String> additionalParameters) throws AccessException {
@@ -561,8 +549,7 @@ public class AccessSdk {
 	 *            Device ID(fingerprint).
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getUniques(String deviceId) throws AccessException {
 		return getUniques(deviceId, null);
@@ -577,8 +564,7 @@ public class AccessSdk {
 	 *            Additional parameters to send to server.
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getUniques(String deviceId, Map<String, String> additionalParameters) throws AccessException {
 		if ((deviceId == null) || deviceId.isEmpty()) {
@@ -615,8 +601,7 @@ public class AccessSdk {
 	 * @param host
 	 *            of the behavio data endpoint
 	 * @param environment
-	 *            as in
-	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 *            as in https://api.behavio.kaptcha.com/<environment>/behavio/data
 	 * @param session
 	 *            The Session ID generated for the Data Collector service.
 	 * @param timing
@@ -625,8 +610,7 @@ public class AccessSdk {
 	 *            customer identifier
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public void setBehavioData(String host, String environment, String session, String timing, String uniq)
 			throws AccessException {
@@ -639,8 +623,7 @@ public class AccessSdk {
 	 * @param host
 	 *            of the behavio data endpoint
 	 * @param environment
-	 *            as in
-	 *            https://api.behavio.kaptcha.com/<environment>/behavio/data
+	 *            as in https://api.behavio.kaptcha.com/<environment>/behavio/data
 	 * @param session
 	 *            The Session ID generated for the Data Collector service.
 	 * @param timing
@@ -651,8 +634,7 @@ public class AccessSdk {
 	 *            Additional parameters to send to server.
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	private void setBehavioData(String host, String environment, String session, String timing, String uniq,
 			Map<String, String> additionalParameters) throws AccessException {
@@ -676,15 +658,13 @@ public class AccessSdk {
 	}
 
 	/**
-	 * Gets the device info, threshold decision, velocity data, Trusted Device
-	 * information and/or BehavioSec. Which data sets will be returned depends
-	 * on the infoFlag that is build with
-	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
-	 * identifier and the supplied for the session's username and password.
+	 * Gets the device info, threshold decision, velocity data, Trusted Device information and/or BehavioSec. Which data
+	 * sets will be returned depends on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer identifier and the supplied for the
+	 * session's username and password.
 	 *
 	 * @param infoFlag
-	 *            the requested set of data elements | int (bytes represented
-	 *            inside) | mandatory
+	 *            the requested set of data elements | int (bytes represented inside) | mandatory
 	 * @param session
 	 *            The Session ID generated for the Data Collector service.
 	 * @param uniq
@@ -695,8 +675,7 @@ public class AccessSdk {
 	 *            The password of the user.
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password)
 			throws AccessException {
@@ -704,15 +683,13 @@ public class AccessSdk {
 	}
 
 	/**
-	 * Gets the device info, threshold decision, velocity data, Trusted Device
-	 * information and/or BehavioSec. Which data sets will be returned depends
-	 * on the infoFlag that is build with
-	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer
-	 * identifier and the supplied for the session's username and password.
+	 * Gets the device info, threshold decision, velocity data, Trusted Device information and/or BehavioSec. Which data
+	 * sets will be returned depends on the infoFlag that is build with
+	 * {@link com.kount.kountaccess.InfoEndpointDataSet}, the unique customer identifier and the supplied for the
+	 * session's username and password.
 	 *
 	 * @param infoFlag
-	 *            the requested set of data elements | int (bytes represented
-	 *            inside) | mandatory
+	 *            the requested set of data elements | int (bytes represented inside) | mandatory
 	 * @param session
 	 *            The Session ID generated for the Data Collector service.
 	 * @param uniq
@@ -725,8 +702,7 @@ public class AccessSdk {
 	 *            Additional parameters to send to server.
 	 * @return A JSONObject containing the response.
 	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there
-	 *             was a problem getting a response.
+	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
 	 */
 	public JSONObject getInfo(int infoFlag, String session, String uniq, String username, String password,
 			Map<String, String> additionalParameters) throws AccessException {
@@ -905,18 +881,21 @@ public class AccessSdk {
 	 * Handles the get request for the device info
 	 */
 	private String getRequest(String urlString) throws AccessException {
-		try {
-			CloseableHttpClient client = getHttpClient();
+		CloseableHttpResponse response = null;
+
+		try (CloseableHttpClient client = getHttpClient()) {
 			HttpGet request = this.getHttpGet(urlString);
 			request.addHeader("Authorization", this.getAuthorizationHeader());
 			request.addHeader("Content-Type", "JSON");
-			CloseableHttpResponse response = client.execute(request);
+			
+			response = client.execute(request);
 			StatusLine status = response.getStatusLine();
 			if (status.getStatusCode() != 200) {
 				throw new AccessException(AccessErrorType.NETWORK_ERROR,
 						"Bad Response(" + status.getStatusCode() + ")" + status.getReasonPhrase() + " " + urlString);
 
 			}
+
 			return this.getResponseAsString(response);
 		} catch (UnknownHostException uhe) {
 			throw new AccessException(AccessErrorType.NETWORK_ERROR, "UNKNOWN HOST(" + urlString + ")");
@@ -924,6 +903,15 @@ public class AccessSdk {
 			throw new AccessException(AccessErrorType.NETWORK_ERROR, "UNKNOWN NETWORK ISSUE, try again later)");
 		} catch (IllegalArgumentException iae) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "BAD URL(" + urlString + ")");
+
+		} finally {
+			try {
+				if (response != null) {
+					response.close();
+				}
+			} catch (IOException ioe) {
+				throw new AccessException(AccessErrorType.INTERNAL_ERROR, "Unable to release resources", ioe);
+			}
 		}
 	}
 
@@ -939,27 +927,38 @@ public class AccessSdk {
 	 *             Thrown if the URL is bad or we can't connect or parse the response.
 	 */
 	private String postRequest(String urlString, List<NameValuePair> values) throws AccessException {
-		try {
-			CloseableHttpClient client = getHttpClient();
+		CloseableHttpResponse response = null;
+		
+		try (CloseableHttpClient client = getHttpClient()) {
+			
 			HttpPost request = getHttpPost(urlString);
 			request.addHeader("Authorization", this.getAuthorizationHeader());
 			HttpEntity entity = new UrlEncodedFormEntity(values);
 			request.setEntity(entity);
 
-			CloseableHttpResponse response = client.execute(request);
+			response = client.execute(request);
 			StatusLine status = response.getStatusLine();
 			if (status.getStatusCode() != 200) {
 				throw new AccessException(AccessErrorType.NETWORK_ERROR,
 						"Bad Response(" + status.getStatusCode() + ")" + status.getReasonPhrase() + " " + urlString);
-
 			}
+
 			return getResponseAsString(response);
 		} catch (UnknownHostException uhe) {
 			throw new AccessException(AccessErrorType.NETWORK_ERROR, "UNKNOWN HOST(" + urlString + ")");
 		} catch (IOException e) {
-			throw new AccessException(AccessErrorType.NETWORK_ERROR, "UNKNOWN NETWORK ISSUE, try again later)");
+			throw new AccessException(AccessErrorType.NETWORK_ERROR, "UNKNOWN NETWORK ISSUE, try again later)", e);
 		} catch (IllegalArgumentException iae) {
 			throw new AccessException(AccessErrorType.INVALID_DATA, "BAD URL(" + urlString + ")");
+			
+		} finally {
+			try {
+				if (response != null) {
+					response.close();
+				}
+			} catch (IOException ioe) {
+				throw new AccessException(AccessErrorType.INTERNAL_ERROR, "Unable to release resources", ioe);
+			}
 		}
 	}
 
