@@ -5,13 +5,12 @@ kount-access-java-sdk 4.0.0-SNAPSHOT
 
 ### New features
 * default API version is changed from 2.1.0 to 4.0.0
-* added a few new endpoints
-** behavio data
-** device trust by device
-** device trust by session
-** get devices
-** get uniques
-** info
+* supporting the latest Kount Access features:
+  * behavio data
+  * device trust
+  * get devices information
+  * get unique devices per session and user
+  * info endpoint
 
 ### Improvements
 * updated examples
