@@ -22,6 +22,8 @@ For more information on what Kount Access is, go to http://www.kount.com
 
 ## Requirements
 
+Using the Kount Access SDK requires `Java 7` or above.
+
 Ensure you have the information needed to instantiate the library in your app.
 
 *  **merchant ID** - Your merchant ID provided to you from Kount.
@@ -38,3 +40,4 @@ Kount Access API Versions:
 * 0400 (default)
 
 For more information on using this library, consult the wiki section.
+

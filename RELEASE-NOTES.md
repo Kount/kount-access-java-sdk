@@ -1,6 +1,10 @@
-kount-access-java-sdk 2.1.1
+kount-access-java-sdk 4.0.0-SNAPSHOT
 ===========================
-**08/30/2018**
+
+**xx/xx/201x**
+
+### Bugfixes
+* SDK-54: releasing HTTP client and HTTP response objects
 
 ### New features
 * default API version is changed from 2.1.0 to 4.0.0
