@@ -6,11 +6,10 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -836,7 +835,7 @@ public class AccessSdk {
 		}
 		String header = merchantId + ":" + apiKey;
 		try {
-			authorizationHeader = "Basic " + DatatypeConverter.printBase64Binary(header.getBytes("UTF8"));
+			authorizationHeader = "Basic " + Base64.getEncoder().encodeToString(header.getBytes("UTF-8"));
 			return authorizationHeader;
 		} catch (UnsupportedEncodingException e) {
 			logger.warn("Could not create authorization header", e);
