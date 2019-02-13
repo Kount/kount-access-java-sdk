@@ -3,6 +3,7 @@ package com.kount.kountaccess;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -833,14 +834,10 @@ public class AccessSdk {
 		if (authorizationHeader != null) {
 			return authorizationHeader;
 		}
+
 		String header = merchantId + ":" + apiKey;
-		try {
-			authorizationHeader = "Basic " + Base64.getEncoder().encodeToString(header.getBytes("UTF-8"));
-			return authorizationHeader;
-		} catch (UnsupportedEncodingException e) {
-			logger.warn("Could not create authorization header", e);
-		}
-		return null;
+		authorizationHeader = "Basic " + Base64.getEncoder().encodeToString(header.getBytes(StandardCharsets.UTF_8));
+		return authorizationHeader;
 	}
 
 	/**
