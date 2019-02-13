@@ -7,11 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -836,7 +836,7 @@ public class AccessSdk {
 		}
 
 		String header = merchantId + ":" + apiKey;
-		authorizationHeader = "Basic " + Base64.getEncoder().encodeToString(header.getBytes(StandardCharsets.UTF_8));
+		authorizationHeader = "Basic " + Base64.encodeBase64String(header.getBytes(StandardCharsets.UTF_8));
 		return authorizationHeader;
 	}
 
