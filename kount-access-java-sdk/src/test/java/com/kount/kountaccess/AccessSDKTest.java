@@ -8,8 +8,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
@@ -21,8 +23,8 @@ import com.kount.kountaccess.AccessException.AccessErrorType;
  */
 public class AccessSDKTest {
 
-	private static final Logger logger = Logger.getLogger(AccessSDKTest.class);
-
+	private static final Logger logger = LogManager.getLogger(AccessSDKTest.class);
+	
 	// Setup data for comparisons.
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";

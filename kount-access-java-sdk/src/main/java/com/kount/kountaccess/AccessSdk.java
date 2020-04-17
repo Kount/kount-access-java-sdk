@@ -24,7 +24,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
 
@@ -49,8 +50,7 @@ import net.sf.json.JSONObject;
  * @version 2.1.0
  */
 public class AccessSdk {
-
-	private static final Logger logger = Logger.getLogger(AccessSdk.class);
+	private static final Logger logger = LogManager.getLogger(AccessSdk.class);
 
 	/**
 	 * This is the default version of the API Responses that this SDK will request. Future versions are intended to be
@@ -73,15 +73,6 @@ public class AccessSdk {
 	 */
 	public static final String TRUSTED_STATE_BANNED = "banned";
 
-	/**
-	 * Bahavio Data Endpoint Prefix
-	 */
-	private static final String BEHAVIO_DATA_ENDPOINT_PREFIX = "https://";
-
-	/**
-	 * Bahavio Data Endpoint Postfix
-	 */
-	private static final String BEHAVIO_DATA_ENDPOINT_POSTFIX = "/behavio/data";
 
 	/**
 	 * Merchant's ID
@@ -595,67 +586,7 @@ public class AccessSdk {
 		return null;
 	}
 
-	/**
-	 * Sets behavio data for a uniq customer identifier.
-	 *
-	 * @param host
-	 *            of the behavio data endpoint
-	 * @param environment
-	 *            as in https://api.behavio.kaptcha.com/<environment>/behavio/data
-	 * @param session
-	 *            The Session ID generated for the Data Collector service.
-	 * @param timing
-	 *            data gathered from a BehavioSec collection
-	 * @param uniq
-	 *            customer identifier
-	 * @return A JSONObject containing the response.
-	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
-	 */
-	public void setBehavioData(String host, String environment, String session, String timing, String uniq)
-			throws AccessException {
-		setBehavioData(host, environment, session, timing, uniq, null);
-	}
 
-	/**
-	 * Sets behavio data for a uniq customer identifier.
-	 *
-	 * @param host
-	 *            of the behavio data endpoint
-	 * @param environment
-	 *            as in https://api.behavio.kaptcha.com/<environment>/behavio/data
-	 * @param session
-	 *            The Session ID generated for the Data Collector service.
-	 * @param timing
-	 *            data gathered from a BehavioSec collection
-	 * @param uniq
-	 *            customer identifier
-	 * @param additionalParameters
-	 *            Additional parameters to send to server.
-	 * @return A JSONObject containing the response.
-	 * @throws AccessException
-	 *             Thrown if any of the parameter values are invalid or there was a problem getting a response.
-	 */
-	private void setBehavioData(String host, String environment, String session, String timing, String uniq,
-			Map<String, String> additionalParameters) throws AccessException {
-		verifySessionId(session);
-		verifyBehavioData(host, environment, timing, uniq);
-
-		if (additionalParameters == null) {
-			additionalParameters = new HashMap<>();
-		}
-		additionalParameters.put("m", Integer.toString(merchantId));
-		additionalParameters.put("timing", timing);
-		additionalParameters.put("uniq", uniq);
-
-		List<NameValuePair> parameters = createRequestParameters(session, null, null, additionalParameters);
-		String behavioDataEndpoint = BEHAVIO_DATA_ENDPOINT_PREFIX + host + "/" + environment
-				+ BEHAVIO_DATA_ENDPOINT_POSTFIX;
-		logger.debug("info request: host = " + behavioDataEndpoint + ", parameters = " + parameters.toString());
-		long startTime = System.currentTimeMillis();
-		this.postRequest(behavioDataEndpoint, parameters);
-		logger.debug("request elapsed time = " + (System.currentTimeMillis() - startTime));
-	}
 
 	/**
 	 * Gets the device info, threshold decision, velocity data, Trusted Device information and/or BehavioSec. Which data
