@@ -17,7 +17,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import net.sf.json.JSONObject;
@@ -29,8 +30,8 @@ import net.sf.json.JSONObject;
  */
 public class GetDeviceTest {
 
-	private static final Logger logger = Logger.getLogger(GetDeviceTest.class);
-
+	private static final Logger logger = LogManager.getLogger(GetDeviceTest.class);
+	
 	// Setup data for comparisons.
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";

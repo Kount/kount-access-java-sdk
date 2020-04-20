@@ -17,7 +17,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import net.sf.json.JSONObject;
@@ -28,8 +29,8 @@ import net.sf.json.JSONObject;
  * @author Stanislav Milev
  */
 public class GetDecisionTest {
-
-	private static final Logger logger = Logger.getLogger(GetDecisionTest.class);
+	
+	private static final Logger logger = LogManager.getLogger(GetDecisionTest.class);
 
 	int merchantId = 999999;
 	String host = merchantId + ".kountaccess.com";

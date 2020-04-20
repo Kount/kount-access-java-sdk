@@ -17,7 +17,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import com.kount.kountaccess.AccessException.AccessErrorType;
@@ -31,7 +32,7 @@ import net.sf.json.JSONObject;
  */
 public class GetInfoTest {
 
-	private static final Logger logger = Logger.getLogger(GetInfoTest.class);
+	private static final Logger logger = LogManager.getLogger(GetInfoTest.class);
 
 	// Setup data for comparisons.
 	int merchantId = 999999;

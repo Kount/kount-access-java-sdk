@@ -115,17 +115,10 @@ public class KountAccessExample {
 			JSONObject uniques = sdk.getUniques(deviceId);
 			this.printUniquesInfo(uniques);
 
-			// behavio/data endpoint example
-			String behavioHost = "api.behavio.kaptcha.com";
-			String environment = "sandbox";
-			String timing = "{\"valid\":\"json\"}";
-			sdk.setBehavioData(behavioHost, environment, session, timing, uniq);
-
 			// info endpoint example (requesting all data)
 			int infoFlag = new InfoEndpointDataSet().withInfo().withVelocity().withBehavioSec().withDecision()
 					.withTrustedDevice().build();
 			JSONObject info = sdk.getInfo(infoFlag, session, uniq, username, password);
-			printBehavioSec(info.getJSONObject("behavioSec"));
 			printDecisionInfo(info.getJSONObject("decision"));
 			printDeviceInfo(info.getJSONObject("device"));
 			System.out.println("Trusted state: " + info.getJSONObject("trusted").get("state"));
@@ -143,14 +136,6 @@ public class KountAccessExample {
 		}
 	}
 
-	private void printBehavioSec(JSONObject behavioSecData) {
-		System.out.println("Behavio Sec Data");
-		System.out.println("Is Bot:" + behavioSecData.get("isBot"));
-		System.out.println("Is Trained:" + behavioSecData.get("isTrained"));
-		System.out.println("Score:" + behavioSecData.get("score"));
-		System.out.println("Confidence:" + behavioSecData.get("confidence"));
-		System.out.println("Policy ID:" + behavioSecData.get("policyId"));
-	}
 
 	/**
 	 * Example method to walk through the device JSONObject data.

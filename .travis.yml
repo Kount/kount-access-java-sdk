@@ -1,6 +1,5 @@
 language: java
 jdk: 
-  - openjdk7
   - oraclejdk11
 script: 
   - export _JAVA_OPTIONS="-Xmx512m -Xms256m"
